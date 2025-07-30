@@ -5,11 +5,63 @@ using System.Transactions;
 
 namespace EGO.Gladius.DataTypes;
 
+public struct TSPR<T>
+{
+    internal List<KeyValuePair<int, TransactionScope>>? Transactions;
+
+    public SPR<T> SPR { get; set; }
+
+    public TSPR(SPR<T> spr)
+    {
+        SPR = spr;
+    }
+
+    public TSPR<T> MarkScope(int index = 0)
+    {
+        if (!SPR.Succeed(out var res))
+            return this;
+
+        if (res is TransactionScope tr)
+            (Transactions ??= [])
+                .Add(new(index, tr));
+
+        return this;
+    }
+    public TSPR<T> MarkScope<E>(E index) where E : Enum =>
+        MarkScope(Convert.ToInt32(index));
+
+    public TSPR<T> CompleteScope<E>(E index) where E : Enum =>
+        CompleteScope(Convert.ToInt32(index));
+
+    public TSPR<T> CompleteScope(int index = -1)
+    {
+        foreach (var item in Transactions ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+            {
+                if (Succeed())
+                    c.Complete();
+                c.Dispose();
+            }
+        return this;
+    }
+
+    public DSPR<T> DisposeScope<E>(E index) where E : Enum =>
+        DisposeScope(Convert.ToInt32(index));
+
+    public DSPR<T> DisposeScope(int index = -1)
+    {
+        foreach (var item in Transactions ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                c.Dispose();
+
+        return this;
+    }
+}
+
 public struct DSPR<T>
 {
     internal List<KeyValuePair<int, IDisposable>>? Disposables;
     internal List<KeyValuePair<int, IAsyncDisposable>>? AsyncDisposables;
-    internal List<KeyValuePair<int, TransactionScope>>? Transactions;
 
     public SPR<T> SPR { get; set; }
 
@@ -18,12 +70,11 @@ public struct DSPR<T>
         SPR = spr;
     }
 
-    public DSPR(SPR<T> spr, List<KeyValuePair<int, IDisposable>>? disposables, List<KeyValuePair<int, IAsyncDisposable>>? asyncDisposables, List<KeyValuePair<int, TransactionScope>>? transactions)
+    public DSPR(SPR<T> spr, List<KeyValuePair<int, IDisposable>>? disposables, List<KeyValuePair<int, IAsyncDisposable>>? asyncDisposables)
     {
         SPR = spr;
         Disposables = disposables;
         AsyncDisposables = asyncDisposables;
-        Transactions = transactions;
     }
 
     #region suppress fault
@@ -326,20 +377,6 @@ public struct DSPR<T>
         return this;
     }
 
-    public DSPR<T> MarkScope<E>(E index) where E : Enum =>
-        MarkScope(Convert.ToInt32(index));
-
-    public DSPR<T> MarkScope(int index = 0)
-    {
-        if (!SPR.Succeed(out var res))
-            return this;
-
-        if (res is TransactionScope tr)
-            (Transactions ??= [])
-                .Add(new(index, tr));
-
-        return this;
-    }
 
     public DSPR<T> Dispose<E>(E index) where E : Enum =>
         Dispose(Convert.ToInt32(index));
@@ -353,32 +390,6 @@ public struct DSPR<T>
         return this;
     }
 
-    public DSPR<T> CompleteScope<E>(E index) where E : Enum =>
-        CompleteScope(Convert.ToInt32(index));
-
-    public DSPR<T> CompleteScope(int index = -1)
-    {
-        foreach (var item in Transactions ?? [])
-            if ((index == -1 || item.Key == index) && item.Value is { } c)
-            {
-                if (Succeed())
-                    c.Complete();
-                c.Dispose();
-            }
-        return this;
-    }
-
-    public DSPR<T> DisposeScope<E>(E index) where E : Enum =>
-        DisposeScope(Convert.ToInt32(index));
-
-    public DSPR<T> DisposeScope(int index = -1)
-    {
-        foreach (var item in Transactions ?? [])
-            if ((index == -1 || item.Key == index) && item.Value is { } c)
-                c.Dispose();
-
-        return this;
-    }
 
     public ValueTask<DSPR<T>> DisposeAsync<E>(E index) where E : Enum =>
         DisposeAsync(Convert.ToInt32(index));

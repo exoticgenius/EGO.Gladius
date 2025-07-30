@@ -165,7 +165,7 @@ public struct SPR : ISP
 /// and is not determinable until result qualification happens
 /// </summary>
 [DebuggerDisplay("{DebuggerPreview}")]
-public struct SPR<T> : ISP, INeutralSPR
+public struct SPR<T> : ISP
 {
     public static readonly SPR<T> Completed = new(default(T)!);
     private SPV<T> Value { get; }
@@ -180,6 +180,12 @@ public struct SPR<T> : ISP, INeutralSPR
     public SPR(SPF fault)
     {
         Value = default;
+        Fault = fault;
+    }
+
+    internal SPR(SPV<T> val, SPF fault)
+    {
+        Value = val;
         Fault = fault;
     }
 

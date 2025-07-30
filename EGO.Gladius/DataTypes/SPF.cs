@@ -4,6 +4,7 @@ using System.Text;
 
 namespace EGO.Gladius.DataTypes;
 
+
 /// <summary>
 /// super position fault
 /// </summary>
@@ -100,16 +101,6 @@ public struct SPF
         }
 
         return sb.ToString();
-    }
-}
-
-public class SPFE : Exception
-{
-    public SPF Fault { get; }
-
-    public SPFE(SPF fault) : base(fault.Message)
-    {
-        Fault = fault;
     }
 }
 
