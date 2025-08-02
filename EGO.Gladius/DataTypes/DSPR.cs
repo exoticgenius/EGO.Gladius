@@ -45,10 +45,10 @@ public struct TSPR<T>
         return this;
     }
 
-    public DSPR<T> DisposeScope<E>(E index) where E : Enum =>
+    public TSPR<T> DisposeScope<E>(E index) where E : Enum =>
         DisposeScope(Convert.ToInt32(index));
 
-    public DSPR<T> DisposeScope(int index = -1)
+    public TSPR<T> DisposeScope(int index = -1)
     {
         foreach (var item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)

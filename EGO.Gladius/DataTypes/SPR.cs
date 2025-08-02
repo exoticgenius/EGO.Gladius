@@ -304,7 +304,7 @@ public struct SPR<T> : ISP
         try
         {
             if (Succeed())
-                return del(Value.Payload);
+                return del(this);
 
             return Fault;
         }

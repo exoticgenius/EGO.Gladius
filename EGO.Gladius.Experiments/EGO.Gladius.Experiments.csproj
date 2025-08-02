@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EGO.Gladius\EGO.Gladius.csproj" />
+  </ItemGroup>
+
 </Project>
