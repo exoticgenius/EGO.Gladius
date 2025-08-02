@@ -89,13 +89,15 @@ public interface IDSP<T, Ret,AllRet> : ISP<T>
     }
 }
 
-public interface ITSP<T, Ret> : ISP<T>
+public interface ITSP<T, Ret, AllRet> : ISP<T>
 {
     internal List<KeyValuePair<short, TransactionScope>>? Transactions { get; set; }
 
     Ret MarkScope(short index);
     Ret CompleteScope(short index);
     Ret DisposeScope(short index);
+    AllRet CompleteAllScopes();
+    AllRet DisposeAllScopes();
 
 
     internal void InternalMarkScope(short index = 0)
@@ -107,7 +109,6 @@ public interface ITSP<T, Ret> : ISP<T>
 
     internal void InternalCompleteScope(short index = -1)
     {
-        
         foreach (var item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
             {
@@ -122,5 +123,17 @@ public interface ITSP<T, Ret> : ISP<T>
         foreach (var item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
+    }
+
+    internal void InternalCompleteAllScopes()
+    {
+        foreach (var item in Transactions ?? [])
+            InternalCompleteScope(item.Key);
+    }
+
+    internal void InternalDisposeAllScopes()
+    {
+        foreach (var item in Transactions ?? [])
+            InternalDisposeScope(item.Key);
     }
 }

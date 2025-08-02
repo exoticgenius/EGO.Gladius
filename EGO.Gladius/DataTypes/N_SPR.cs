@@ -1,5 +1,6 @@
 ﻿using EGO.Gladius.Contracts;
 
+using System;
 using System.Transactions;
 
 namespace EGO.Gladius.DataTypes;
@@ -63,6 +64,18 @@ public struct N_DSPR<T> : IDSP<T, N_DSPR<T>, N_SPR<T>>, ISPRConvertible<N_SPR<T>
     {
     }
 
+    public N_DSPR(
+        N_SPV<T> value,
+        N_SPF fault,
+        List<KeyValuePair<short, IDisposable>>? disposables,
+        List<KeyValuePair<short, IAsyncDisposable>>? asyncDisposables)
+    {
+        Value = value;
+        Fault = fault;
+        ((IDSP<T, N_DSPR<T>, N_SPR<T>>)this).Disposables = disposables;
+        ((IDSP<T, N_DSPR<T>, N_SPR<T>>)this).AsyncDisposables = asyncDisposables;
+    }
+
     public N_SPR<T> Descend() =>
         DisposeAll();
 
@@ -92,9 +105,9 @@ public struct N_DSPR<T> : IDSP<T, N_DSPR<T>, N_SPR<T>>, ISPRConvertible<N_SPR<T>
 }
 
 
-public struct N_TSPR<T> : ITSP<T, N_TSPR<T>>, ISPRConvertible<T>
+public struct N_TSPR<T> : ITSP<T, N_TSPR<T>, N_SPR<T>>, ISPRConvertible<N_SPR<T>>
 {
-    List<KeyValuePair<short, TransactionScope>>? ITSP<T, N_TSPR<T>>.Transactions { get; set; }
+    List<KeyValuePair<short, TransactionScope>>? ITSP<T, N_TSPR<T>, N_SPR<T>>.Transactions { get; set; }
 
     public N_SPV<T> Value { get; set; }
     public N_SPF Fault { get; set; }
@@ -108,10 +121,8 @@ public struct N_TSPR<T> : ITSP<T, N_TSPR<T>>, ISPRConvertible<T>
         Fault = fault;
     }
 
-    public T Descend() =>
-        Succeed() ?
-        Value.Payload :
-        throw Fault.GenSPFE();
+    public N_SPR<T> Descend() =>
+        CompleteAllScopes();
 
     public bool Succeed() => Value.Completed;
     public bool Succeed(out T result)
@@ -129,34 +140,48 @@ public struct N_TSPR<T> : ITSP<T, N_TSPR<T>>, ISPRConvertible<T>
     #region transactional
     public N_TSPR<T> MarkScope(short index = 0)
     {
-        ((ITSP<T, N_TSPR<T>>)this).InternalMarkScope(index);
+        ((ITSP<T, N_TSPR<T>, N_SPR<T>>)this).InternalMarkScope(index);
 
         return this;
     }
 
     public N_TSPR<T> CompleteScope(short index = -1)
     {
-        ((ITSP<T, N_TSPR<T>>)this).InternalCompleteScope(index);
+        ((ITSP<T, N_TSPR<T>, N_SPR<T>>)this).InternalCompleteScope(index);
 
         return this;
     }
 
     public N_TSPR<T> DisposeScope(short index = -1)
     {
-        ((ITSP<T, N_TSPR<T>>)this).InternalDisposeScope(index);
+        ((ITSP<T, N_TSPR<T>, N_SPR<T>>)this).InternalDisposeScope(index);
 
         return this;
+    }
+
+    public N_SPR<T> CompleteAllScopes()
+    {
+        ((ITSP<T, N_TSPR<T>, N_SPR<T>>)this).InternalCompleteAllScopes();
+
+        return new N_SPR<T>(Value, Fault);
+    }
+
+    public N_SPR<T> DisposeAllScopes()
+    {
+        ((ITSP<T, N_TSPR<T>, N_SPR<T>>)this).InternalDisposeAllScopes();
+
+        return new N_SPR<T>(Value, Fault);
     }
     #endregion transactional
 
 }
 
 
-public struct N_TDSPR<T> : ITSP<T, N_TDSPR<T>>, IDSP<T, N_TDSPR<T>, N_TSPR<T>>, ISPRConvertible<T>
+public struct N_TDSPR<T> : ITSP<T, N_TDSPR<T>, N_DSPR<T>>, IDSP<T, N_TDSPR<T>, N_TSPR<T>>, ISPRConvertible<N_SPR<T>>
 {
     List<KeyValuePair<short, IDisposable>>? IDSP<T, N_TDSPR<T>, N_TSPR<T>>.Disposables { get; set; }
     List<KeyValuePair<short, IAsyncDisposable>>? IDSP<T, N_TDSPR<T>, N_TSPR<T>>.AsyncDisposables { get; set; }
-    List<KeyValuePair<short, TransactionScope>>? ITSP<T, N_TDSPR<T>>.Transactions { get; set; }
+    List<KeyValuePair<short, TransactionScope>>? ITSP<T, N_TDSPR<T>, N_DSPR<T>>.Transactions { get; set; }
 
     public N_SPV<T> Value { get; set; }
     public N_SPF Fault { get; set; }
@@ -170,10 +195,9 @@ public struct N_TDSPR<T> : ITSP<T, N_TDSPR<T>>, IDSP<T, N_TDSPR<T>, N_TSPR<T>>, 
         Fault = fault;
     }
 
-    public T Descend() =>
-        Succeed() ?
-        Value.Payload :
-        throw Fault.GenSPFE();
+    public N_SPR<T> Descend() =>
+        CompleteAllScopes()
+        .DisposeAll();
 
     public bool Succeed() => Value.Completed;
     public bool Succeed(out T result)
@@ -214,23 +238,45 @@ public struct N_TDSPR<T> : ITSP<T, N_TDSPR<T>>, IDSP<T, N_TDSPR<T>, N_TSPR<T>>, 
     #region transactional
     public N_TDSPR<T> MarkScope(short index = 0)
     {
-        ((ITSP<T, N_TDSPR<T>>)this).InternalMarkScope(index);
+        ((ITSP<T, N_TDSPR<T>, N_DSPR<T>>)this).InternalMarkScope(index);
 
         return this;
     }
 
     public N_TDSPR<T> CompleteScope(short index = -1)
     {
-        ((ITSP<T, N_TDSPR<T>>)this).InternalCompleteScope(index);
+        ((ITSP<T, N_TDSPR<T>, N_DSPR<T>>)this).InternalCompleteScope(index);
 
         return this;
     }
 
     public N_TDSPR<T> DisposeScope(short index = -1)
     {
-        ((ITSP<T, N_TDSPR<T>>)this).InternalDisposeScope(index);
+        ((ITSP<T, N_TDSPR<T>, N_DSPR<T>>)this).InternalDisposeScope(index);
 
         return this;
+    }
+
+    public N_DSPR<T> CompleteAllScopes()
+    {
+        ((ITSP<T, N_TDSPR<T>, N_DSPR<T>>)this).InternalCompleteAllScopes();
+
+        return new N_DSPR<T>(
+            Value,
+            Fault,
+            ((IDSP<T, N_TDSPR<T>, N_TSPR<T>>)this).Disposables,
+            ((IDSP<T, N_TDSPR<T>, N_TSPR<T>>)this).AsyncDisposables);
+    }
+
+    public N_DSPR<T> DisposeAllScopes()
+    {
+        ((ITSP<T, N_TDSPR<T>, N_DSPR<T>>)this).InternalDisposeAllScopes();
+
+        return new N_DSPR<T>(
+            Value,
+            Fault,
+            ((IDSP<T, N_TDSPR<T>, N_TSPR<T>>)this).Disposables,
+            ((IDSP<T, N_TDSPR<T>, N_TSPR<T>>)this).AsyncDisposables);
     }
     #endregion transactional
 }
