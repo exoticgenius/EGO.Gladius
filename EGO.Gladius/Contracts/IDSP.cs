@@ -1,4 +1,5 @@
-﻿using EGO.Gladius.DataTypes;
+﻿using EGO.Gladius.Core;
+using EGO.Gladius.DataTypes;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -54,7 +55,6 @@ public static class SPR_Sync_Transformer
         }
     }
 }
-
 
 public static class SPR_To_Async_Transformer
 {
@@ -179,7 +179,6 @@ public static class SPR_To_Async_Transformer
         }
     }
 }
-
 
 public static class SPR_From_ValueTask_Transformer
 {
@@ -330,7 +329,6 @@ public static class SPR_From_ValueTask_Transformer
     }
 }
 
-
 public static class SPR_From_Task_Transformer
 {
     public static async ValueTask<SPR<R>> Transform<T, R>(this Task<SPR<T>> taskSpr, Func<T, R> del)
@@ -478,16 +476,1429 @@ public static class SPR_From_Task_Transformer
             return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
         }
     }
-
-
 }
 
+///////////////////////////////////////////////
+
+public static class DSPR_Sync_Transformer
+{
+    public static DSPR<R> Transform<T, R>(this DSPR<T> spr, Func<T, R> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static DSPR<R> Transform<T, R>(this DSPR<T> spr, Func<T, SPR<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static DSPR<R> Transform<T, R>(this DSPR<T> spr, Func<DSPR<T>, SPR<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+public static class DSPR_To_Async_Transformer
+{
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this DSPR<T> spr, Func<T, ValueTask<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this DSPR<T> spr, Func<T, Task<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
 
 
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this DSPR<T> spr, Func<T, ValueTask<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this DSPR<T> spr, Func<T, Task<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
 
 
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this DSPR<T> spr, Func<DSPR<T>, ValueTask<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this DSPR<T> spr, Func<DSPR<T>, Task<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
 
 
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this DSPR<T> spr, Func<DSPR<T>, ValueTask<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this DSPR<T> spr, Func<DSPR<T>, Task<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+public static class DSPR_From_ValueTask_Transformer
+{
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this ValueTask<DSPR<T>> taskSpr, Func<T, R> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this ValueTask<DSPR<T>> taskSpr, Func<T, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this ValueTask<DSPR<T>> taskSpr, Func<DSPR<T>, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this ValueTask<DSPR<T>> taskSpr, Func<T, Task<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this ValueTask<DSPR<T>> taskSpr, Func<T, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this ValueTask<DSPR<T>> taskSpr, Func<DSPR<T>, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this ValueTask<DSPR<T>> taskSpr, Func<T, ValueTask<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this ValueTask<DSPR<T>> taskSpr, Func<T, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this ValueTask<DSPR<T>> taskSpr, Func<DSPR<T>, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+public static class DSPR_From_Task_Transformer
+{
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this Task<DSPR<T>> taskSpr, Func<T, R> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this Task<DSPR<T>> taskSpr, Func<T, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this Task<DSPR<T>> taskSpr, Func<DSPR<T>, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this Task<DSPR<T>> taskSpr, Func<T, Task<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this Task<DSPR<T>> taskSpr, Func<T, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this Task<DSPR<T>> taskSpr, Func<DSPR<T>, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this Task<DSPR<T>> taskSpr, Func<T, ValueTask<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this Task<DSPR<T>> taskSpr, Func<T, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<DSPR<R>> Transform<T, R>(this Task<DSPR<T>> taskSpr, Func<DSPR<T>, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+///////////////////////////////////////////////
+
+public static class TSPR_Sync_Transformer
+{
+    public static TSPR<R> Transform<T, R>(this TSPR<T> spr, Func<T, R> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static TSPR<R> Transform<T, R>(this TSPR<T> spr, Func<T, SPR<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static TSPR<R> Transform<T, R>(this TSPR<T> spr, Func<TSPR<T>, SPR<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+public static class TSPR_To_Async_Transformer
+{
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this TSPR<T> spr, Func<T, ValueTask<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+    
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this TSPR<T> spr, Func<T, Task<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this TSPR<T> spr, Func<T, ValueTask<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this TSPR<T> spr, Func<T, Task<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this TSPR<T> spr, Func<TSPR<T>, ValueTask<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this TSPR<T> spr, Func<TSPR<T>, Task<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this TSPR<T> spr, Func<TSPR<T>, ValueTask<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this TSPR<T> spr, Func<TSPR<T>, Task<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+public static class TSPR_From_ValueTask_Transformer
+{
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this ValueTask<TSPR<T>> taskSpr, Func<T, R> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this ValueTask<TSPR<T>> taskSpr, Func<T, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this ValueTask<TSPR<T>> taskSpr, Func<TSPR<T>, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this ValueTask<TSPR<T>> taskSpr, Func<T, Task<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this ValueTask<TSPR<T>> taskSpr, Func<T, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this ValueTask<TSPR<T>> taskSpr, Func<TSPR<T>, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this ValueTask<TSPR<T>> taskSpr, Func<T, ValueTask<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this ValueTask<TSPR<T>> taskSpr, Func<T, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this ValueTask<TSPR<T>> taskSpr, Func<TSPR<T>, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+public static class TSPR_From_Task_Transformer
+{
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this Task<TSPR<T>> taskSpr, Func<T, R> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this Task<TSPR<T>> taskSpr, Func<T, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this Task<TSPR<T>> taskSpr, Func<TSPR<T>, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this Task<TSPR<T>> taskSpr, Func<T, Task<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this Task<TSPR<T>> taskSpr, Func<T, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this Task<TSPR<T>> taskSpr, Func<TSPR<T>, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this Task<TSPR<T>> taskSpr, Func<T, ValueTask<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this Task<TSPR<T>> taskSpr, Func<T, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TSPR<R>> Transform<T, R>(this Task<TSPR<T>> taskSpr, Func<TSPR<T>, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+///////////////////////////////////////////////
+
+public static class TDSPR_Sync_Transformer
+{
+    public static TDSPR<R> Transform<T, R>(this TDSPR<T> spr, Func<T, R> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static TDSPR<R> Transform<T, R>(this TDSPR<T> spr, Func<T, SPR<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static TDSPR<R> Transform<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, SPR<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+public static class TDSPR_To_Async_Transformer
+{
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this TDSPR<T> spr, Func<T, ValueTask<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this TDSPR<T> spr, Func<T, Task<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this TDSPR<T> spr, Func<T, ValueTask<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this TDSPR<T> spr, Func<T, Task<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, Task<R>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, Task<SPR<R>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+public static class TDSPR_From_ValueTask_Transformer
+{
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, R> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, Task<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, ValueTask<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
+
+public static class TDSPR_From_Task_Transformer
+{
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, R> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, SPR<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, Task<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, ValueTask<R>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<R>> Transform<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            if (spr.Succeed())
+                return spr.Pass(await del(spr));
+
+            return spr.Pass<R>(spr.Fault);
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+        }
+    }
+}
 
 
 
