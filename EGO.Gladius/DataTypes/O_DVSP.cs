@@ -4,30 +4,30 @@ using System.Transactions;
 
 namespace EGO.Gladius.DataTypes;
 
-public struct DVSP : ISP
+public struct O_DVSP : ISP
 {
-    public static readonly DVSP Completed = new();
+    public static readonly O_DVSP Completed = new();
 
     internal List<KeyValuePair<int, IDisposable>>? Disposables;
     internal List<KeyValuePair<int, IAsyncDisposable>>? AsyncDisposables;
     internal List<KeyValuePair<int, TransactionScope>>? Transactions;
 
     private bool Success { get; }
-    public SPF Fault { get; }
+    public O_SPF Fault { get; }
 
-    public DVSP()
+    public O_DVSP()
     {
         Success = true;
         Fault = default;
     }
 
-    public DVSP(SPF fault)
+    public O_DVSP(O_SPF fault)
     {
         Success = false;
         Fault = fault;
     }
 
-    public DVSP(SPF fault, List<KeyValuePair<int, IDisposable>>? disposables, List<KeyValuePair<int, IAsyncDisposable>>? asyncDisposables, List<KeyValuePair<int, TransactionScope>>? transactions)
+    public O_DVSP(O_SPF fault, List<KeyValuePair<int, IDisposable>>? disposables, List<KeyValuePair<int, IAsyncDisposable>>? asyncDisposables, List<KeyValuePair<int, TransactionScope>>? transactions)
     {
         Fault = fault;
         Disposables = disposables;
@@ -35,7 +35,7 @@ public struct DVSP : ISP
         Transactions = transactions;
     }
 
-    public DVSP(List<KeyValuePair<int, IDisposable>>? disposables, List<KeyValuePair<int, IAsyncDisposable>>? asyncDisposables, List<KeyValuePair<int, TransactionScope>>? transactions)
+    public O_DVSP(List<KeyValuePair<int, IDisposable>>? disposables, List<KeyValuePair<int, IAsyncDisposable>>? asyncDisposables, List<KeyValuePair<int, TransactionScope>>? transactions)
     {
         Success = true;
         Disposables = disposables;
@@ -43,10 +43,10 @@ public struct DVSP : ISP
         Transactions = transactions;
     }
 
-    public DVSP Dispose<E>(E index) where E : Enum =>
+    public O_DVSP Dispose<E>(E index) where E : Enum =>
         Dispose(Convert.ToInt32(index));
 
-    public DVSP Dispose(int index = -1)
+    public O_DVSP Dispose(int index = -1)
     {
         foreach (var item in Disposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
@@ -55,10 +55,10 @@ public struct DVSP : ISP
         return this;
     }
 
-    public ValueTask<DVSP> DisposeAsync<E>(E index) where E : Enum =>
+    public ValueTask<O_DVSP> DisposeAsync<E>(E index) where E : Enum =>
         DisposeAsync(Convert.ToInt32(index));
 
-    public async ValueTask<DVSP> DisposeAsync(int index = -1)
+    public async ValueTask<O_DVSP> DisposeAsync(int index = -1)
     {
         foreach (var item in AsyncDisposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
@@ -67,7 +67,7 @@ public struct DVSP : ISP
         return this;
     }
 
-    public DVSP DisposeAll()
+    public O_DVSP DisposeAll()
     {
         foreach (var item in Disposables ?? [])
             item.Value?.Dispose();
@@ -75,7 +75,7 @@ public struct DVSP : ISP
         return Completed;
     }
 
-    public async ValueTask<DVSP> DisposeAllAsync()
+    public async ValueTask<O_DVSP> DisposeAllAsync()
     {
         foreach (var item in AsyncDisposables ?? [])
             if (item.Value is { } c)
@@ -88,7 +88,7 @@ public struct DVSP : ISP
 
     public bool Faulted() => !Success;
 
-    public bool Faulted(out SPF fault)
+    public bool Faulted(out O_SPF fault)
     {
         if (!Success)
         {
@@ -100,16 +100,16 @@ public struct DVSP : ISP
         return false;
     }
 
-    public DVSP Pass(VSP spr) =>
+    public O_DVSP Pass(O_VSP spr) =>
         new(Fault, Disposables, AsyncDisposables, Transactions);
 
-    public DVSP Pass<R>(SPR<R> spr) =>
+    public O_DVSP Pass<R>(O_SPR<R> spr) =>
         new(spr.Fault, Disposables, AsyncDisposables, Transactions);
 
-    public DVSP CompleteScope<E>(E index) where E : Enum =>
+    public O_DVSP CompleteScope<E>(E index) where E : Enum =>
         CompleteScope(Convert.ToInt32(index));
 
-    public DVSP CompleteScope(int index = -1)
+    public O_DVSP CompleteScope(int index = -1)
     {
         foreach (var item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
@@ -120,10 +120,10 @@ public struct DVSP : ISP
         return this;
     }
 
-    public DVSP DisposeScope<E>(E index) where E : Enum =>
+    public O_DVSP DisposeScope<E>(E index) where E : Enum =>
         DisposeScope(Convert.ToInt32(index));
 
-    public DVSP DisposeScope(int index = -1)
+    public O_DVSP DisposeScope(int index = -1)
     {
         foreach (var item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)

@@ -4,12 +4,9 @@ using System.Text;
 
 namespace EGO.Gladius.DataTypes;
 
-
-/// <summary>
-/// super position fault
-/// </summary>
 public struct SPF
 {
+
     #region ' props '
     public LinkedList<MethodInfo>? CapturedContext { get; }
 
@@ -19,6 +16,7 @@ public struct SPF
 
     public string? Message { get; }
     #endregion ' props '
+
 
     #region ' ctors '
     public SPF() : this(default, default, default, default) { }
@@ -46,10 +44,6 @@ public struct SPF
         Parameters = parameters;
         Exception = exception;
         Message = message;
-
-        Console.WriteLine(message ?? "");
-        Console.WriteLine(exception?.Message ?? "");
-        Console.WriteLine(capturedContext?.Name ?? "");
     }
     #endregion ' ctors '
 
@@ -72,8 +66,6 @@ public struct SPF
     public static SPF Gen(MethodInfo capturedContext, object[] parameters, Exception exception, string message) => new(capturedContext, parameters, exception, message);
     #endregion ' generators '
 
-    public void Throw() => throw new SPFE(this);
-    public SPFE GenSPFE() => new(this);
 
     private static bool WithFile;
 
@@ -102,16 +94,7 @@ public struct SPF
 
         return sb.ToString();
     }
-}
 
-public class SPFST : Exception
-{
-    private readonly string stackTrace;
-
-    public SPFST(string stackTrace)
-    {
-        this.stackTrace = stackTrace;
-    }
-
-    public override string? StackTrace => stackTrace;
+    public void Throw() => throw new SPFE(this);
+    public SPFE GenSPFE() => new(this);
 }

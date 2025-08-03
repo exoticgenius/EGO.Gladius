@@ -1,5 +1,5 @@
 ﻿using EGO.Gladius.DataTypes;
 using EGO.Gladius.Contracts;
-var x = new N_SPR<int>();
+var x = new SPR<int>();
 
 var res = x.Transform(x => x + 1);

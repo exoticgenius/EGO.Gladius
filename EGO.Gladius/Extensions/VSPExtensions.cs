@@ -6,7 +6,7 @@ namespace EGO.Gladius.Extensions;
 
 public static class VSPExtensions
 {
-    public static async Task<SPR<T>> Transform<T>(this Task<VSP> task, [NotNull] Func<T> del)
+    public static async Task<O_SPR<T>> Transform<T>(this Task<O_VSP> task, [NotNull] Func<T> del)
     {
         try
         {
@@ -18,11 +18,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async Task<SPR<T>> Transform<T>(this Task<VSP> task, [NotNull] Func<SPR<T>> del)
+    public static async Task<O_SPR<T>> Transform<T>(this Task<O_VSP> task, [NotNull] Func<O_SPR<T>> del)
     {
         try
         {
@@ -34,11 +34,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async Task<SPR<T>> Transform<T>(this Task<VSP> task, [NotNull] Func<Task<T>> del)
+    public static async Task<O_SPR<T>> Transform<T>(this Task<O_VSP> task, [NotNull] Func<Task<T>> del)
     {
         try
         {
@@ -50,11 +50,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async Task<SPR<T>> Transform<T>(this Task<VSP> task, [NotNull] Func<Task<SPR<T>>> del)
+    public static async Task<O_SPR<T>> Transform<T>(this Task<O_VSP> task, [NotNull] Func<Task<O_SPR<T>>> del)
     {
         try
         {
@@ -66,11 +66,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async ValueTask<SPR<T>> Transform<T>(this ValueTask<VSP> task, [NotNull] Func<T> del)
+    public static async ValueTask<O_SPR<T>> Transform<T>(this ValueTask<O_VSP> task, [NotNull] Func<T> del)
     {
         try
         {
@@ -82,11 +82,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async ValueTask<SPR<T>> Transform<T>(this ValueTask<VSP> task, [NotNull] Func<SPR<T>> del)
+    public static async ValueTask<O_SPR<T>> Transform<T>(this ValueTask<O_VSP> task, [NotNull] Func<O_SPR<T>> del)
     {
         try
         {
@@ -98,11 +98,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async ValueTask<SPR<T>> Transform<T>(this ValueTask<VSP> task, [NotNull] Func<Task<T>> del)
+    public static async ValueTask<O_SPR<T>> Transform<T>(this ValueTask<O_VSP> task, [NotNull] Func<Task<T>> del)
     {
         try
         {
@@ -114,11 +114,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async ValueTask<SPR<T>> Transform<T>(this ValueTask<VSP> task, [NotNull] Func<Task<SPR<T>>> del)
+    public static async ValueTask<O_SPR<T>> Transform<T>(this ValueTask<O_VSP> task, [NotNull] Func<Task<O_SPR<T>>> del)
     {
         try
         {
@@ -130,11 +130,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async ValueTask<SPR<T>> Transform<T>(this ValueTask<VSP> task, [NotNull] Func<ValueTask<T>> del)
+    public static async ValueTask<O_SPR<T>> Transform<T>(this ValueTask<O_VSP> task, [NotNull] Func<ValueTask<T>> del)
     {
         try
         {
@@ -146,11 +146,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async ValueTask<SPR<T>> Transform<T>(this ValueTask<VSP> task, [NotNull] Func<ValueTask<SPR<T>>> del)
+    public static async ValueTask<O_SPR<T>> Transform<T>(this ValueTask<O_VSP> task, [NotNull] Func<ValueTask<O_SPR<T>>> del)
     {
         try
         {
@@ -162,11 +162,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async ValueTask<SPR<T>> Transform<T>(this Task<VSP> task, [NotNull] Func<ValueTask<T>> del)
+    public static async ValueTask<O_SPR<T>> Transform<T>(this Task<O_VSP> task, [NotNull] Func<ValueTask<T>> del)
     {
         try
         {
@@ -178,11 +178,11 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public static async ValueTask<SPR<T>> Transform<T>(this Task<VSP> task, [NotNull] Func<ValueTask<SPR<T>>> del)
+    public static async ValueTask<O_SPR<T>> Transform<T>(this Task<O_VSP> task, [NotNull] Func<ValueTask<O_SPR<T>>> del)
     {
         try
         {
@@ -194,7 +194,7 @@ public static class VSPExtensions
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 

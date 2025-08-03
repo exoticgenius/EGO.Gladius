@@ -1,8 +1,6 @@
-﻿namespace EGO.Gladius.DataTypes;
+﻿
+namespace EGO.Gladius.DataTypes;
 
-/// <summary>
-/// super position value
-/// </summary>
 public struct SPV<T>
 {
     public bool Completed { get; }

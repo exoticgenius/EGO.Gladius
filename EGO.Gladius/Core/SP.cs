@@ -114,7 +114,7 @@ public static class SP
                 genArg = genArg[0].GenericTypeArguments;
 
             var suppressor = "SuppressTask";
-            if (typeof(VSP).IsAssignableFrom(genArg[0]))
+            if (typeof(O_VSP).IsAssignableFrom(genArg[0]))
                 suppressor = "SuppressTaskVoid";
 
             il.Emit(OpCodes.Call, typeof(SP).GetMethods().First(x => x.Name == suppressor).MakeGenericMethod(genArg));
@@ -127,7 +127,7 @@ public static class SP
                 genArg = genArg[0].GenericTypeArguments;
 
             var suppressor = "SuppressValueTask";
-            if (typeof(VSP).IsAssignableFrom(genArg[0]))
+            if (typeof(O_VSP).IsAssignableFrom(genArg[0]))
                 suppressor = "SuppressValueTaskVoid";
 
             il.Emit(OpCodes.Call, typeof(SP).GetMethods().First(x => x.Name == "SuppressValueTask").MakeGenericMethod(genArg));
@@ -156,22 +156,22 @@ public static class SP
 
         il.Emit(OpCodes.Ldloc_2); //2 => 2
 
-        il.Emit(OpCodes.Newobj, typeof(SPF).GetConstructor(new Type[] { typeof(MethodInfo), typeof(object[]), typeof(Exception) })!);
+        il.Emit(OpCodes.Newobj, typeof(O_SPF).GetConstructor(new Type[] { typeof(MethodInfo), typeof(object[]), typeof(Exception) })!);
 
         if (typeof(Task).IsAssignableFrom(returnType))
         {
-            il.Emit(OpCodes.Newobj, returnType.GenericTypeArguments[0].GetConstructor(new Type[] { typeof(SPF) })!);
+            il.Emit(OpCodes.Newobj, returnType.GenericTypeArguments[0].GetConstructor(new Type[] { typeof(O_SPF) })!);
             il.Emit(OpCodes.Call, typeof(Task).GetRuntimeMethods().First(x => x.Name == "FromResult").MakeGenericMethod(returnType.GenericTypeArguments[0]));
 
         }
         else if (typeof(ValueTask).IsAssignableFrom(returnType))
         {
-            il.Emit(OpCodes.Newobj, returnType.GenericTypeArguments[0].GetConstructor(new Type[] { typeof(SPF) })!);
+            il.Emit(OpCodes.Newobj, returnType.GenericTypeArguments[0].GetConstructor(new Type[] { typeof(O_SPF) })!);
             il.Emit(OpCodes.Call, typeof(ValueTask<>).MakeGenericType(returnType.GenericTypeArguments[0]).GetConstructor(new Type[] { returnType.GenericTypeArguments[0] })!);
         }
         else
         {
-            il.Emit(OpCodes.Newobj, methodinfo.ReturnType.GetConstructor(new Type[] { typeof(SPF) })!);
+            il.Emit(OpCodes.Newobj, methodinfo.ReturnType.GetConstructor(new Type[] { typeof(O_SPF) })!);
         }
         il.Emit(OpCodes.Stloc_0);
         il.Emit(OpCodes.Leave_S, end);
@@ -184,7 +184,7 @@ public static class SP
     }
 
     [DebuggerStepThrough]
-    public static async Task<VSP> SuppressTaskVoid<T>(Task<VSP> input)
+    public static async Task<O_VSP> SuppressTaskVoid<T>(Task<O_VSP> input)
     {
         try
         {
@@ -192,12 +192,12 @@ public static class SP
         }
         catch (Exception ex)
         {
-            return new VSP(new SPF(ex));
+            return new O_VSP(new O_SPF(ex));
         }
     }
 
     [DebuggerStepThrough]
-    public static async Task<SPR<T>> SuppressTask<T>(Task<SPR<T>> input)
+    public static async Task<O_SPR<T>> SuppressTask<T>(Task<O_SPR<T>> input)
     {
         try
         {
@@ -205,12 +205,12 @@ public static class SP
         }
         catch (Exception ex)
         {
-            return new SPR<T>(new SPF(ex));
+            return new O_SPR<T>(new O_SPF(ex));
         }
     }
 
     [DebuggerStepThrough]
-    public static async ValueTask<VSP> SuppressValueTaskVoid<T>(ValueTask<VSP> input)
+    public static async ValueTask<O_VSP> SuppressValueTaskVoid<T>(ValueTask<O_VSP> input)
     {
         try
         {
@@ -218,12 +218,12 @@ public static class SP
         }
         catch (Exception ex)
         {
-            return new VSP(new SPF(ex));
+            return new O_VSP(new O_SPF(ex));
         }
     }
 
     [DebuggerStepThrough]
-    public static async ValueTask<SPR<T>> SuppressValueTask<T>(ValueTask<SPR<T>> input)
+    public static async ValueTask<O_SPR<T>> SuppressValueTask<T>(ValueTask<O_SPR<T>> input)
     {
         try
         {
@@ -231,14 +231,14 @@ public static class SP
         }
         catch (Exception ex)
         {
-            return new SPR<T>(new SPF(ex));
+            return new O_SPR<T>(new O_SPF(ex));
         }
     }
 
     public static T Gen<T>(params object?[]? @params) =>
         SP<T>.Gen(@params);
 
-    public static SPR<T> Sup<T>(Func<T> function)
+    public static O_SPR<T> Sup<T>(Func<T> function)
     {
         try
         {
@@ -246,7 +246,7 @@ public static class SP
         }
         catch (Exception e)
         {
-            return new SPR<T>(new SPF(e));
+            return new O_SPR<T>(new O_SPF(e));
         }
     }
 }

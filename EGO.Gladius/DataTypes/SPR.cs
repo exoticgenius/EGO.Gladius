@@ -1,541 +1,322 @@
 ﻿using EGO.Gladius.Contracts;
 
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System;
+using System.Transactions;
 
 namespace EGO.Gladius.DataTypes;
 
-public struct SPR : ISP
+public struct SPR<T> : ISP<T>, ISPRConvertible<T>
 {
-    public static readonly SPR Completed = new();
-
-    public static SPR<T> FromResult<T>(T item) => new(item);
-
-    public bool Succeed() => true;
-
-    public bool Faulted() => false;
-
-    public static SPR<T> Gen<T>(T val) => val;
-
-    public static VSP Gen(VSP val) => val;
-
-    public static async ValueTask<VSP> Gen(Task<VSP> val)
-    {
-        try
-        {
-            return await val;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(e);
-        }
-    }
-
-    public static async ValueTask<VSP> Gen(Task val)
-    {
-        try
-        {
-            await val;
-
-            return VSP.Completed;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(e);
-        }
-    }
-
-    public static async ValueTask<VSP> Gen(ValueTask val)
-    {
-        try
-        {
-            await val;
-
-            return VSP.Completed;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(e);
-        }
-    }
-
-    public static async ValueTask<VSP> Gen(ValueTask<VSP> val)
-    {
-        try
-        {
-            return await val;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(e);
-        }
-    }
-
-    public static async Task<SPR<T>> Run<T>([NotNull] Func<Task<T>> del)
-    {
-        try
-        {
-            return await del();
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, e);
-        }
-    }
-
-    public static async Task<SPR<T>> InsistAsync<T>([NotNull] Func<Task<T>> source, int tryFor)
-    {
-        Exception caught = null;
-        while (tryFor != 0)
-        {
-            try
-            {
-                --tryFor;
-                return await source();
-            }
-            catch (Exception e)
-            {
-                caught = e;
-            }
-        }
-
-        return SPF.Gen(caught);
-    }
-
-    public static async Task<SPR<T>> InsistAsync<T>([NotNull] Func<Task<SPR<T>>> source, int tryFor)
-    {
-        SPF? lastSPF = null;
-
-        while (tryFor != 0)
-        {
-            --tryFor;
-            var res = await source();
-
-            if (res.Succeed())
-                return res;
-
-            lastSPF = res.Fault;
-        }
-
-        return lastSPF ?? SPF.Gen("fault running source");
-    }
-
-    public static async Task<SPR<T>> InsistAsync<T>([NotNull] Func<Task<SPR<T>>> source, CancellationToken ct)
-    {
-        SPF? lastSPF = null;
-
-        while (!ct.IsCancellationRequested)
-        {
-            var res = await source();
-
-            if (res.Succeed())
-                return res;
-
-            lastSPF = res.Fault;
-        }
-
-        return lastSPF ?? SPF.Gen("fault running source");
-    }
-
-    public static async Task<SPR<T>> InsistAsync<T>([NotNull] Func<Task<SPR<T>>> source, TimeSpan timeout)
-    {
-        SPF? lastSPF = null;
-        var sw = Stopwatch.StartNew();
-
-        while (sw.Elapsed < timeout)
-        {
-            var res = await source();
-
-            if (res.Succeed())
-                return res;
-
-            lastSPF = res.Fault;
-        }
-
-        sw.Stop();
-
-        return lastSPF ?? SPF.Gen("fault running source");
-    }
-}
-
-/// <summary>
-/// super position result,
-/// equivalents to a maybe result that can contain result data or exception at the same time,
-/// and is not determinable until result qualification happens
-/// </summary>
-[DebuggerDisplay("{DebuggerPreview}")]
-public struct SPR<T> : ISP
-{
-    public static readonly SPR<T> Completed = new(default(T)!);
-    private SPV<T> Value { get; }
+    #region props
+    SPV<T> ISP<T>.Value { get; set; }
     public SPF Fault { get; }
+    #endregion props
 
-    public SPR(T val)
+    #region ctors
+    public SPR()
     {
-        Value = new(val);
+    }
+    internal SPR(SPF fault)
+    {
+        ((ISP<T>)this).Value = default;
+        Fault = fault;
+    }
+    internal SPR(T payload)
+    {
+        ((ISP<T>)this).Value = new SPV<T>(payload);
         Fault = default;
     }
-
-    public SPR(SPF fault)
-    {
-        Value = default;
-        Fault = fault;
-    }
-
     internal SPR(SPV<T> val, SPF fault)
     {
-        Value = val;
+        ((ISP<T>)this).Value = val;
         Fault = fault;
     }
-
-    #region suppress fault
-
-    public SPR<T> SuppressFault([NotNull] Func<SPR<T>, SPR<T>> del)
+    internal SPR(T payload, SPF fault)
     {
-        if (Succeed())
-            return this;
+        ((ISP<T>)this).Value = new SPV<T>(payload);
+        Fault = fault;
+    }
+    #endregion ctors
 
-        return Transform(del);
+    #region core funcs
+    public T Descend() =>
+        Succeed() ?
+        ((ISP<T>)this).Value.Payload :
+        throw Fault.GenSPFE();
+
+    //public N_SPR<X> Pass<X>(X val) =>
+    //    new N_SPR<X>(
+    //        new N_SPV<X>(val),
+    //        Fault);
+
+    public bool Succeed() => ((ISP<T>)this).Value.Completed;
+    public bool Succeed(out T result)
+    {
+        if (((ISP<T>)this).Value.Completed)
+        {
+            result = ((ISP<T>)this).Value.Payload;
+            return true;
+        }
+
+        result = default!;
+        return false;
     }
 
-    public async ValueTask<SPR<T>> SuppressFault([NotNull] Func<SPR<T>, ValueTask<SPR<T>>> del)
+    public bool Faulted() => !((ISP<T>)this).Value.Completed;
+    public bool Faulted(out SPF fault)
     {
-        if (Succeed())
-            return this;
+        if (!((ISP<T>)this).Value.Completed)
+        {
+            fault = Fault;
+            return true;
+        }
 
-        return await Transform(del);
+        fault = default;
+        return false;
+    }
+    #endregion core funcs
+
+    #region Operators
+    //public static implicit operator N_SPR<T>(in T val) =>
+    //    new(val, default);
+
+    public static implicit operator SPR<T>(in SPF fault) =>
+        new(fault);
+
+
+#if Release
+    public override string ToString()
+    {
+        throw new Exception("calling ToString on SPR<> object is impossible");
+    }
+#endif
+    #endregion Operators
+}
+
+public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
+{
+    #region props
+    List<KeyValuePair<short, IDisposable>>? IDSP.Disposables { get; set; }
+    List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables { get; set; }
+
+    public SPF Fault { get; set; }
+    SPV<T> ISP<T>.Value { get; set; }
+    #endregion props
+
+    #region ctors
+    public DSPR()
+    {
     }
 
-    #endregion
-
-    #region suppress null
-
-    public SPR<T> SuppressNull([NotNull] Func<T> del)
+    public DSPR(
+        SPV<T> value,
+        SPF fault,
+        List<KeyValuePair<short, IDisposable>>? disposables,
+        List<KeyValuePair<short, IAsyncDisposable>>? asyncDisposables)
     {
-        if (Faulted())
-            return this;
+        ((ISP<T>)this).Value = value;
+        Fault = fault;
+        ((IDSP<T, DSPR<T>, SPR<T>>)this).Disposables = disposables;
+        ((IDSP<T, DSPR<T>, SPR<T>>)this).AsyncDisposables = asyncDisposables;
+    }
+    #endregion ctors
 
-        if (HasValue())
-            return this;
+    #region core funcs
+    public SPR<T> Descend() =>
+        DisposeAll();
+    public DSPR<X> Pass<X>(X val) =>
+        new DSPR<X>(
+            new SPV<X>(val),
+            Fault,
+            ((IDSP)this).Disposables,
+            ((IDSP)this).AsyncDisposables);
 
-        try
+    public bool Succeed() => ((ISP<T>)this).Value.Completed;
+    public bool Succeed(out T result)
+    {
+        if (((ISP<T>)this).Value.Completed)
         {
-            return del();
+            result = ((ISP<T>)this).Value.Payload;
+            return true;
         }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, e);
-        }
+
+        result = default!;
+        return false;
     }
 
-    public SPR<T> SuppressNull([NotNull] Func<SPR<T>> del)
+    public bool Faulted() => !((ISP<T>)this).Value.Completed;
+    public bool Faulted(out SPF fault)
     {
-        if (Faulted())
-            return this;
-
-        if (HasValue())
-            return this;
-
-        try
+        if (!((ISP<T>)this).Value.Completed)
         {
-            return del();
+            fault = Fault;
+            return true;
         }
-        catch (Exception e)
+
+        fault = default;
+        return false;
+    }
+    #endregion core funcs
+
+    #region disposal
+    public DSPR<T> MarkDispose(short index = 0)
+    {
+        ((IDSP<T, DSPR<T>, SPR<T>>)this).MarkDispose(index);
+
+        return this;
+    }
+    public DSPR<T> Dispose(short index = -1)
+    {
+        ((IDSP<T, DSPR<T>, SPR<T>>)this).Dispose(index);
+
+        return this;
+    }
+    public SPR<T> DisposeAll()
+    {
+        ((IDSP<T, DSPR<T>, SPR<T>>)this).DisposeAll();
+
+        return new SPR<T>(((ISP<T>)this).Value, Fault);
+    }
+    #endregion disposal
+}
+
+public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
+{
+    #region props
+    List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions { get; set; }
+
+    SPV<T> ISP<T>.Value { get; set; }
+    public SPF Fault { get; set; }
+    #endregion props
+
+    #region ctors
+    public TSPR()
+    {
+    }
+    internal TSPR(
+        SPV<T> val,
+        SPF fault,
+        List<KeyValuePair<short, TransactionScope>>? transactions)
+    {
+        ((ISP<T>)this).Value = val;
+        Fault = fault;
+        ((ITSP<T, TSPR<T>, SPR<T>>)this).Transactions = transactions;
+    }
+    #endregion ctors
+
+    #region core funcs
+    public SPR<T> Descend() =>
+        CompleteAllScopes();
+    public TSPR<X> Pass<X>(X val) =>
+        new TSPR<X>(
+            new SPV<X>(val),
+            Fault,
+            ((ITSP)this).Transactions);
+
+    public bool Succeed() => ((ISP<T>)this).Value.Completed;
+    public bool Succeed(out T result)
+    {
+        if (((ISP<T>)this).Value.Completed)
         {
-            return SPF.Gen(del.Method, e);
+            result = ((ISP<T>)this).Value.Payload;
+            return true;
         }
+
+        result = default!;
+        return false;
     }
 
-    public async ValueTask<SPR<T>> SuppressNull([NotNull] Func<ValueTask<SPR<T>>> del)
+    public bool Faulted() => !((ISP<T>)this).Value.Completed;
+    public bool Faulted(out SPF fault)
     {
-        try
+        if (!((ISP<T>)this).Value.Completed)
         {
-            if (Faulted())
-                return this;
-
-            if (HasValue())
-                return this;
-
-            return await del();
+            fault = Fault;
+            return true;
         }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, e);
-        }
+
+        fault = default;
+        return false;
     }
+    #endregion core funcs
 
-    #endregion
-
-    #region transform
-
-    public SPR<R> Transform<R>([NotNull] Func<T, R> del)
+    #region transactional
+    public TSPR<T> MarkScope(short index = 0)
     {
-        try
-        {
-            if (Succeed())
-                return del(Value.Payload);
+        ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalMarkScope(index);
 
-            return Fault;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
+        return this;
     }
-
-    public SPR<R> Transform<R>([NotNull] Func<T, SPR<R>> del)
+    public TSPR<T> CompleteScope(short index = -1)
     {
-        try
-        {
-            if (Succeed())
-                return del(Value.Payload);
+        ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalCompleteScope(index);
 
-            return Fault;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
+        return this;
     }
-
-    private SPR<R> Transform<R>([NotNull] Func<SPR<T>, SPR<R>> del)
+    public TSPR<T> DisposeScope(short index = -1)
     {
-        try
-        {
-            if (Succeed())
-                return del(this);
+        ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalDisposeScope(index);
 
-            return Fault;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
+        return this;
     }
-
-    public async ValueTask<SPR<R>> Transform<R>([NotNull] Func<T, ValueTask<SPR<R>>> del)
+    public SPR<T> CompleteAllScopes()
     {
-        try
-        {
-            if (Succeed())
-                return await del(Value.Payload);
+        ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalCompleteAllScopes();
 
-            return Fault;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
+        return new SPR<T>(((ISP<T>)this).Value, Fault);
     }
-
-    public async ValueTask<SPR<R>> Transform<R>([NotNull] Func<SPR<T>, ValueTask<SPR<R>>> del)
+    public SPR<T> DisposeAllScopes()
     {
-        try
-        {
-            if (Succeed())
-                return await del(this);
+        ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalDisposeAllScopes();
 
-            return Fault;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
+        return new SPR<T>(((ISP<T>)this).Value, Fault);
     }
+    #endregion transactional
+}
 
-    public async ValueTask<SPR<R>> Transform<R>([NotNull] Func<T, ValueTask<R>> del)
+public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>, ISPRConvertible<SPR<T>>
+{
+    #region props
+    List<KeyValuePair<short, IDisposable>>? IDSP.Disposables { get; set; }
+    List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables { get; set; }
+    List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions { get; set; }
+
+    public SPV<T> Value { get; set; }
+    public SPF Fault { get; set; }
+    #endregion props
+
+    #region ctors
+    public TDSPR()
     {
-        try
-        {
-            if (Succeed())
-                return await del(Value.Payload);
-
-            return Fault;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
     }
-
-    public async ValueTask<SPR<R>> Transform<R>([NotNull] Func<T, Task<SPR<R>>> del)
+    public TDSPR(
+       SPV<T> value,
+       SPF fault,
+       List<KeyValuePair<short, TransactionScope>>? transactions,
+       List<KeyValuePair<short, IDisposable>>? disposables,
+       List<KeyValuePair<short, IAsyncDisposable>>? asyncDisposables)
     {
-        try
-        {
-            if (Succeed())
-                return await del(Value.Payload);
-
-            return Fault;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
+        ((ISP<T>)this).Value = value;
+        Fault = fault;
+        ((ITSP)this).Transactions = transactions;
+        ((IDSP)this).Disposables = disposables;
+        ((IDSP)this).AsyncDisposables = asyncDisposables;
     }
+    #endregion ctors
 
-    public async ValueTask<SPR<R>> Transform<R>([NotNull] Func<T, Task<R>> del)
-    {
-        try
-        {
-            if (Succeed())
-                return await del(Value.Payload);
-
-            return Fault;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
-    }
-
-    #endregion
-
-    #region transparent
-
-    public SPR<T> Transparent([NotNull] Action<T?> del)
-    {
-        try
-        {
-            if (Succeed(out var res))
-                del(res);
-            else
-                del(default);
-
-            return this;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
-    }
-
-    public async ValueTask<SPR<T>> Transparent([NotNull] Func<T?, Task> del)
-    {
-        try
-        {
-            if (Succeed(out var res))
-                await del(res);
-            else
-                await del(default);
-
-            return this;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
-    }
-
-    public async ValueTask<SPR<T>> Transparent([NotNull] Func<T?, ValueTask> del)
-    {
-        try
-        {
-            if (Succeed(out var res))
-                await del(res);
-            else
-                await del(default);
-
-            return this;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
-    }
-
-    public SPR<T> Transparent([NotNull] Action del)
-    {
-        try
-        {
-            del();
-
-            return this;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
-    }
-
-    public async ValueTask<SPR<T>> Transparent([NotNull] Func<Task> del)
-    {
-        try
-        {
-            await del();
-
-            return this;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
-    }
-
-    public async ValueTask<SPR<T>> Transparent([NotNull] Func<ValueTask> del)
-    {
-        try
-        {
-            await del();
-
-            return this;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
-    }
-
-    #endregion
-
-    #region to vsp
-
-    private VSP ToVSP([NotNull] Func<SPR<T>, VSP> del)
-    {
-        try
-        {
-            if (Succeed())
-                return del(Value.Payload);
-
-            return Fault;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
-    }
-
-    public VSP ToVSP([NotNull] Func<T, VSP> del)
-    {
-        try
-        {
-            if (Succeed())
-                return del(Value.Payload);
-
-            return Fault;
-        }
-        catch (Exception e)
-        {
-            return SPF.Gen(del.Method, [Value.Payload], e);
-        }
-    }
-
-    #endregion to vsp
-
-    public DSPR<T> MarkDispose(int index) =>
-        new DSPR<T>(this).MarkDispose(index);
-
-    public DSPR<T> MarkDispose<E>(E index) where E : Enum =>
-        new DSPR<T>(this).MarkDispose(index);
-
-    public DSPR<T> MarkScope(int index) =>
-        new DSPR<T>(this).MarkScope(index);
-
-    public DSPR<T> MarkScope<E>(E index) where E : Enum =>
-        new DSPR<T>(this).MarkScope(index);
+    #region core funcs
+    public SPR<T> Descend() =>
+        CompleteAllScopes()
+        .DisposeAll();
+    public TDSPR<X> Pass<X>(X val) =>
+        new TDSPR<X>(
+            new SPV<X>(val),
+            Fault,
+            ((ITSP)this).Transactions,
+            ((IDSP)this).Disposables,
+            ((IDSP)this).AsyncDisposables);
 
     public bool Succeed() => Value.Completed;
-
     public bool Succeed(out T result)
     {
         if (Value.Completed)
@@ -548,21 +329,7 @@ public struct SPR<T> : ISP
         return false;
     }
 
-    public bool Succeed(out T result, out SPF fault)
-    {
-        fault = Fault;
-
-        if (Value.Completed)
-        {
-            result = Value.Payload;
-            return true;
-        }
-
-        result = default!;
-        return false;
-    }
     public bool Faulted() => !Value.Completed;
-
     public bool Faulted(out SPF fault)
     {
         if (!Value.Completed)
@@ -574,47 +341,70 @@ public struct SPR<T> : ISP
         fault = default;
         return false;
     }
+    #endregion core funcs
 
-    public bool HasValue() =>
-        Value.HasValue();
-
-    public object? ExtractPayload()
+    #region disposal
+    public TDSPR<T> MarkDispose(short index = 0)
     {
-        if (Succeed(out var result))
-            return result;
+        ((IDSP<T, TDSPR<T>>)this).MarkDispose(index);
 
-        return Fault;
+        return this;
     }
-
-    public static implicit operator SPR<T>(in T val) =>
-        new(val);
-
-    public static implicit operator SPR<T>(in SPF fault) =>
-        new(fault);
-
-    public static implicit operator SPR<T>(in SPR tag) =>
-        new(default(T)!);
-
-#if Release
-    public override string ToString()
+    public TDSPR<T> Dispose(short index = -1)
     {
-        throw new Exception("calling ToString on SPR<> object is impossible");
-    }
-#endif
+        ((IDSP<T, TDSPR<T>, TSPR<T>>)this).Dispose(index);
 
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Browsable(false)]
-    private object? DebuggerPreview
+        return this;
+    }
+    public TSPR<T> DisposeAll()
     {
-        get
-        {
-            if (!Value.Completed)
-                return Fault.Message ??
-                    Fault.Exception?.Message ??
-                    "result faulted";
+        ((IDSP<T, TDSPR<T>, TSPR<T>>)this).DisposeAll();
 
-            return Value.Payload;
-        }
+        return new TSPR<T>(
+            Value,
+            Fault,
+            ((ITSP<T, TDSPR<T>, DSPR<T>>)this).Transactions);
     }
+    #endregion disposal
+
+    #region transactional
+    public TDSPR<T> MarkScope(short index = 0)
+    {
+        ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalMarkScope(index);
+
+        return this;
+    }
+    public TDSPR<T> CompleteScope(short index = -1)
+    {
+        ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalCompleteScope(index);
+
+        return this;
+    }
+    public TDSPR<T> DisposeScope(short index = -1)
+    {
+        ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalDisposeScope(index);
+
+        return this;
+    }
+    public DSPR<T> CompleteAllScopes()
+    {
+        ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalCompleteAllScopes();
+
+        return new DSPR<T>(
+            Value,
+            Fault,
+            ((IDSP<T, TDSPR<T>, TSPR<T>>)this).Disposables,
+            ((IDSP<T, TDSPR<T>, TSPR<T>>)this).AsyncDisposables);
+    }
+    public DSPR<T> DisposeAllScopes()
+    {
+        ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalDisposeAllScopes();
+
+        return new DSPR<T>(
+            Value,
+            Fault,
+            ((IDSP<T, TDSPR<T>, TSPR<T>>)this).Disposables,
+            ((IDSP<T, TDSPR<T>, TSPR<T>>)this).AsyncDisposables);
+    }
+    #endregion transactional
 }

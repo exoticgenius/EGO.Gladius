@@ -5,18 +5,18 @@ using System.Transactions;
 
 namespace EGO.Gladius.DataTypes;
 
-public struct TSPR<T>
+public struct O_TSPR<T>
 {
     internal List<KeyValuePair<int, TransactionScope>>? Transactions;
 
-    public SPR<T> SPR { get; set; }
+    public O_SPR<T> SPR { get; set; }
 
-    public TSPR(SPR<T> spr)
+    public O_TSPR(O_SPR<T> spr)
     {
         SPR = spr;
     }
 
-    public TSPR<T> MarkScope(int index = 0)
+    public O_TSPR<T> MarkScope(int index = 0)
     {
         if (!SPR.Succeed(out var res))
             return this;
@@ -27,13 +27,13 @@ public struct TSPR<T>
 
         return this;
     }
-    public TSPR<T> MarkScope<E>(E index) where E : Enum =>
+    public O_TSPR<T> MarkScope<E>(E index) where E : Enum =>
         MarkScope(Convert.ToInt32(index));
 
-    public TSPR<T> CompleteScope<E>(E index) where E : Enum =>
+    public O_TSPR<T> CompleteScope<E>(E index) where E : Enum =>
         CompleteScope(Convert.ToInt32(index));
 
-    public TSPR<T> CompleteScope(int index = -1)
+    public O_TSPR<T> CompleteScope(int index = -1)
     {
         foreach (var item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
@@ -45,10 +45,10 @@ public struct TSPR<T>
         return this;
     }
 
-    public TSPR<T> DisposeScope<E>(E index) where E : Enum =>
+    public O_TSPR<T> DisposeScope<E>(E index) where E : Enum =>
         DisposeScope(Convert.ToInt32(index));
 
-    public TSPR<T> DisposeScope(int index = -1)
+    public O_TSPR<T> DisposeScope(int index = -1)
     {
         foreach (var item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
@@ -58,19 +58,19 @@ public struct TSPR<T>
     }
 }
 
-public struct DSPR<T>
+public struct O_DSPR<T>
 {
     internal List<KeyValuePair<int, IDisposable>>? Disposables;
     internal List<KeyValuePair<int, IAsyncDisposable>>? AsyncDisposables;
 
-    public SPR<T> SPR { get; set; }
+    public O_SPR<T> SPR { get; set; }
 
-    public DSPR(SPR<T> spr)
+    public O_DSPR(O_SPR<T> spr)
     {
         SPR = spr;
     }
 
-    public DSPR(SPR<T> spr, List<KeyValuePair<int, IDisposable>>? disposables, List<KeyValuePair<int, IAsyncDisposable>>? asyncDisposables)
+    public O_DSPR(O_SPR<T> spr, List<KeyValuePair<int, IDisposable>>? disposables, List<KeyValuePair<int, IAsyncDisposable>>? asyncDisposables)
     {
         SPR = spr;
         Disposables = disposables;
@@ -79,7 +79,7 @@ public struct DSPR<T>
 
     #region suppress fault
 
-    public DSPR<T> SuppressFault([NotNull] Func<SPR<T>, SPR<T>> del)
+    public O_DSPR<T> SuppressFault([NotNull] Func<O_SPR<T>, O_SPR<T>> del)
     {
         if (Succeed())
             return this;
@@ -87,7 +87,7 @@ public struct DSPR<T>
         return Transform(del);
     }
 
-    public async ValueTask<DSPR<T>> SuppressFault([NotNull] Func<SPR<T>, ValueTask<SPR<T>>> del)
+    public async ValueTask<O_DSPR<T>> SuppressFault([NotNull] Func<O_SPR<T>, ValueTask<O_SPR<T>>> del)
     {
         if (Succeed())
             return this;
@@ -99,7 +99,7 @@ public struct DSPR<T>
 
     #region suppress null
 
-    public DSPR<T> SuppressNull([NotNull] Func<T> del)
+    public O_DSPR<T> SuppressNull([NotNull] Func<T> del)
     {
         if (Faulted())
             return this;
@@ -113,11 +113,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault(SPF.Gen(del.Method, e));
+            return Fault(O_SPF.Gen(del.Method, e));
         }
     }
 
-    public async ValueTask<DSPR<T>> SuppressNull([NotNull] Func<ValueTask<SPR<T>>> del)
+    public async ValueTask<O_DSPR<T>> SuppressNull([NotNull] Func<ValueTask<O_SPR<T>>> del)
     {
         if (Faulted())
             return this;
@@ -131,7 +131,7 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault(SPF.Gen(del.Method, e));
+            return Fault(O_SPF.Gen(del.Method, e));
         }
     }
 
@@ -139,7 +139,7 @@ public struct DSPR<T>
 
     #region transparent
 
-    public DSPR<T> Transparent([NotNull] Action<T?> del)
+    public O_DSPR<T> Transparent([NotNull] Action<T?> del)
     {
         try
         {
@@ -152,11 +152,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public async ValueTask<DSPR<T>> Transparent([NotNull] Func<T?, Task> del)
+    public async ValueTask<O_DSPR<T>> Transparent([NotNull] Func<T?, Task> del)
     {
         try
         {
@@ -169,11 +169,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public async ValueTask<DSPR<T>> Transparent([NotNull] Func<T?, ValueTask> del)
+    public async ValueTask<O_DSPR<T>> Transparent([NotNull] Func<T?, ValueTask> del)
     {
         try
         {
@@ -186,11 +186,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public DSPR<T> Transparent([NotNull] Action del)
+    public O_DSPR<T> Transparent([NotNull] Action del)
     {
         try
         {
@@ -200,11 +200,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public async ValueTask<DSPR<T>> Transparent([NotNull] Func<Task> del)
+    public async ValueTask<O_DSPR<T>> Transparent([NotNull] Func<Task> del)
     {
         try
         {
@@ -214,11 +214,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public async ValueTask<DSPR<T>> Transparent([NotNull] Func<ValueTask> del)
+    public async ValueTask<O_DSPR<T>> Transparent([NotNull] Func<ValueTask> del)
     {
         try
         {
@@ -228,7 +228,7 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
@@ -236,7 +236,7 @@ public struct DSPR<T>
 
     #region transform
 
-    public DSPR<R> Transform<R>([NotNull] Func<T, R> del)
+    public O_DSPR<R> Transform<R>([NotNull] Func<T, R> del)
     {
         try
         {
@@ -247,11 +247,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault<R>(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault<R>(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public DSPR<R> Transform<R>([NotNull] Func<T, SPR<R>> del)
+    public O_DSPR<R> Transform<R>([NotNull] Func<T, O_SPR<R>> del)
     {
         try
         {
@@ -262,11 +262,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault<R>(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault<R>(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    private DSPR<R> Transform<R>([NotNull] Func<SPR<T>, SPR<R>> del)
+    private O_DSPR<R> Transform<R>([NotNull] Func<O_SPR<T>, O_SPR<R>> del)
     {
         try
         {
@@ -277,11 +277,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault<R>(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault<R>(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public async ValueTask<DSPR<R>> Transform<R>([NotNull] Func<T, ValueTask<SPR<R>>> del)
+    public async ValueTask<O_DSPR<R>> Transform<R>([NotNull] Func<T, ValueTask<O_SPR<R>>> del)
     {
         try
         {
@@ -292,11 +292,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault<R>(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault<R>(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public async ValueTask<DSPR<R>> Transform<R>([NotNull] Func<SPR<T>, ValueTask<SPR<R>>> del)
+    public async ValueTask<O_DSPR<R>> Transform<R>([NotNull] Func<O_SPR<T>, ValueTask<O_SPR<R>>> del)
     {
         try
         {
@@ -307,11 +307,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault<R>(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault<R>(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public async ValueTask<DSPR<R>> Transform<R>([NotNull] Func<T, ValueTask<R>> del)
+    public async ValueTask<O_DSPR<R>> Transform<R>([NotNull] Func<T, ValueTask<R>> del)
     {
         try
         {
@@ -322,11 +322,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault<R>(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault<R>(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public async ValueTask<DSPR<R>> Transform<R>([NotNull] Func<T, Task<SPR<R>>> del)
+    public async ValueTask<O_DSPR<R>> Transform<R>([NotNull] Func<T, Task<O_SPR<R>>> del)
     {
         try
         {
@@ -337,11 +337,11 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault<R>(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault<R>(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
-    public async ValueTask<DSPR<R>> Transform<R>([NotNull] Func<T, Task<R>> del)
+    public async ValueTask<O_DSPR<R>> Transform<R>([NotNull] Func<T, Task<R>> del)
     {
         try
         {
@@ -352,16 +352,16 @@ public struct DSPR<T>
         }
         catch (Exception e)
         {
-            return Fault<R>(SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
+            return Fault<R>(O_SPF.Gen(del.Method, [SPR.ExtractPayload()], e));
         }
     }
 
     #endregion
 
-    public DSPR<T> MarkDispose<E>(E index) where E : Enum =>
+    public O_DSPR<T> MarkDispose<E>(E index) where E : Enum =>
         MarkDispose(Convert.ToInt32(index));
 
-    public DSPR<T> MarkDispose(int index = 0)
+    public O_DSPR<T> MarkDispose(int index = 0)
     {
         if (!SPR.Succeed(out var res))
             return this;
@@ -378,10 +378,10 @@ public struct DSPR<T>
     }
 
 
-    public DSPR<T> Dispose<E>(E index) where E : Enum =>
+    public O_DSPR<T> Dispose<E>(E index) where E : Enum =>
         Dispose(Convert.ToInt32(index));
 
-    public DSPR<T> Dispose(int index = -1)
+    public O_DSPR<T> Dispose(int index = -1)
     {
         foreach (var item in Disposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
@@ -391,10 +391,10 @@ public struct DSPR<T>
     }
 
 
-    public ValueTask<DSPR<T>> DisposeAsync<E>(E index) where E : Enum =>
+    public ValueTask<O_DSPR<T>> DisposeAsync<E>(E index) where E : Enum =>
         DisposeAsync(Convert.ToInt32(index));
 
-    public async ValueTask<DSPR<T>> DisposeAsync(int index = -1)
+    public async ValueTask<O_DSPR<T>> DisposeAsync(int index = -1)
     {
         foreach (var item in AsyncDisposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
@@ -403,7 +403,7 @@ public struct DSPR<T>
         return this;
     }
 
-    public SPR<T> DisposeAll()
+    public O_SPR<T> DisposeAll()
     {
         foreach (var item in Disposables ?? [])
             item.Value?.Dispose();
@@ -411,7 +411,7 @@ public struct DSPR<T>
         return SPR;
     }
 
-    public async ValueTask<SPR<T>> DisposeAllAsync()
+    public async ValueTask<O_SPR<T>> DisposeAllAsync()
     {
         foreach (var item in AsyncDisposables ?? [])
             if (item.Value is { } c)
@@ -420,16 +420,16 @@ public struct DSPR<T>
         return SPR;
     }
 
-    public DSPR<T> Pass(SPR<T> spr) =>
+    public O_DSPR<T> Pass(O_SPR<T> spr) =>
         new(spr, Disposables, AsyncDisposables, Transactions);
 
-    public DSPR<R> Pass<R>(SPR<R> spr) =>
+    public O_DSPR<R> Pass<R>(O_SPR<R> spr) =>
         new(spr, Disposables, AsyncDisposables, Transactions);
 
-    public DSPR<T> Pass(T val) =>
+    public O_DSPR<T> Pass(T val) =>
         new(val, Disposables, AsyncDisposables, Transactions);
 
-    public DSPR<R> Pass<R>(R val) =>
+    public O_DSPR<R> Pass<R>(R val) =>
         new(val, Disposables, AsyncDisposables, Transactions);
 
     public bool Faulted() =>
@@ -441,31 +441,31 @@ public struct DSPR<T>
     public bool Succeed(out T result) =>
         SPR.Succeed(out result);
 
-    public bool Succeed(out T result, out SPF fault) =>
+    public bool Succeed(out T result, out O_SPF fault) =>
         SPR.Succeed(out result, out fault);
 
-    public bool Faulted(out SPF fault) =>
+    public bool Faulted(out O_SPF fault) =>
         SPR.Faulted(out fault);
 
     public bool HasValue() =>
         SPR.HasValue();
 
-    public DSPR<T> Fault() =>
+    public O_DSPR<T> Fault() =>
         new(new(SPR.Fault), Disposables, AsyncDisposables, Transactions);
 
-    public DSPR<T> Fault(SPF fault) =>
+    public O_DSPR<T> Fault(O_SPF fault) =>
         new(new(fault), Disposables, AsyncDisposables, Transactions);
 
-    public DSPR<R> Fault<R>() =>
+    public O_DSPR<R> Fault<R>() =>
         new(new(SPR.Fault), Disposables, AsyncDisposables, Transactions);
 
-    public DSPR<R> Fault<R>(SPF fault) =>
+    public O_DSPR<R> Fault<R>(O_SPF fault) =>
         new(new(fault), Disposables, AsyncDisposables, Transactions);
 
-    public DVSP ToDVSP() =>
+    public O_DVSP ToDVSP() =>
         new(SPR.Fault, Disposables, AsyncDisposables, Transactions);
 
-    public DVSP ToDVSP(SPF fault) =>
+    public O_DVSP ToDVSP(O_SPF fault) =>
         new(fault, Disposables, AsyncDisposables, Transactions);
 
 }

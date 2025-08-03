@@ -4,20 +4,20 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace EGO.Gladius.DataTypes;
 
-public struct VSP : ISP
+public struct O_VSP : ISP
 {
-    public static readonly VSP Completed = new();
+    public static readonly O_VSP Completed = new();
 
     private bool Success { get; }
-    public SPF Fault { get; }
+    public O_SPF Fault { get; }
 
-    public VSP()
+    public O_VSP()
     {
         Success = true;
         Fault = default;
     }
 
-    public VSP(SPF fault)
+    public O_VSP(O_SPF fault)
     {
         Success = false;
         Fault = fault;
@@ -27,7 +27,7 @@ public struct VSP : ISP
 
     public bool Faulted() => !Success;
 
-    public bool Faulted(out SPF fault)
+    public bool Faulted(out O_SPF fault)
     {
         if (!Success)
         {
@@ -47,7 +47,7 @@ public struct VSP : ISP
 
     #region transform
 
-    public SPR<T> Transform<T>([NotNull] Func<T> del)
+    public O_SPR<T> Transform<T>([NotNull] Func<T> del)
     {
         try
         {
@@ -58,11 +58,11 @@ public struct VSP : ISP
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public SPR<T> Transform<T>([NotNull] Func<SPR<T>> del)
+    public O_SPR<T> Transform<T>([NotNull] Func<O_SPR<T>> del)
     {
         try
         {
@@ -73,11 +73,11 @@ public struct VSP : ISP
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public async ValueTask<SPR<T>> Transform<T>([NotNull] Func<ValueTask<SPR<T>>> del)
+    public async ValueTask<O_SPR<T>> Transform<T>([NotNull] Func<ValueTask<O_SPR<T>>> del)
     {
         try
         {
@@ -88,11 +88,11 @@ public struct VSP : ISP
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public async ValueTask<SPR<T>> Transform<T>([NotNull] Func<ValueTask<T>> del)
+    public async ValueTask<O_SPR<T>> Transform<T>([NotNull] Func<ValueTask<T>> del)
     {
         try
         {
@@ -103,11 +103,11 @@ public struct VSP : ISP
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public async ValueTask<SPR<T>> Transform<T>([NotNull] Func<Task<SPR<T>>> del)
+    public async ValueTask<O_SPR<T>> Transform<T>([NotNull] Func<Task<O_SPR<T>>> del)
     {
         try
         {
@@ -118,11 +118,11 @@ public struct VSP : ISP
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public async ValueTask<SPR<T>> Transform<T>([NotNull] Func<Task<T>> del)
+    public async ValueTask<O_SPR<T>> Transform<T>([NotNull] Func<Task<T>> del)
     {
         try
         {
@@ -133,7 +133,7 @@ public struct VSP : ISP
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
@@ -141,7 +141,7 @@ public struct VSP : ISP
 
     #region transparent
 
-    public VSP Transparent([NotNull] Func<VSP> del)
+    public O_VSP Transparent([NotNull] Func<O_VSP> del)
     {
         try
         {
@@ -152,11 +152,11 @@ public struct VSP : ISP
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public async ValueTask<VSP> Transparent([NotNull] Func<Task<VSP>> del)
+    public async ValueTask<O_VSP> Transparent([NotNull] Func<Task<O_VSP>> del)
     {
         try
         {
@@ -166,11 +166,11 @@ public struct VSP : ISP
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
-    public async ValueTask<VSP> Transparent([NotNull] Func<ValueTask<VSP>> del)
+    public async ValueTask<O_VSP> Transparent([NotNull] Func<ValueTask<O_VSP>> del)
     {
         try
         {
@@ -180,13 +180,13 @@ public struct VSP : ISP
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, e);
+            return O_SPF.Gen(del.Method, e);
         }
     }
 
     #endregion
 
-    public static implicit operator VSP(in SPF fault) =>
+    public static implicit operator O_VSP(in O_SPF fault) =>
         new(fault);
 
 #if Release
