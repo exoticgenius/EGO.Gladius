@@ -16,6 +16,16 @@ public struct N_SPR<T> : ISP<T>, ISPRConvertible<T>
     public N_SPR()
     {
     }
+    internal N_SPR(N_SPF fault)
+    {
+        ((ISP<T>)this).Value = default;
+        Fault = fault;
+    }
+    internal N_SPR(T payload)
+    {
+        ((ISP<T>)this).Value = new N_SPV<T>(payload);
+        Fault = default;
+    }
     internal N_SPR(N_SPV<T> val, N_SPF fault)
     {
         ((ISP<T>)this).Value = val;
@@ -26,11 +36,6 @@ public struct N_SPR<T> : ISP<T>, ISPRConvertible<T>
         ((ISP<T>)this).Value = new N_SPV<T>(payload);
         Fault = fault;
     }
-    internal N_SPR(N_SPF fault)
-    {
-        ((ISP<T>)this).Value = default;
-        Fault = fault;
-    }
     #endregion ctors
 
     #region core funcs
@@ -39,10 +44,10 @@ public struct N_SPR<T> : ISP<T>, ISPRConvertible<T>
         ((ISP<T>)this).Value.Payload :
         throw Fault.GenSPFE();
 
-    public N_SPR<X> Pass<X>(X val) =>
-        new N_SPR<X>(
-            new N_SPV<X>(val),
-            Fault);
+    //public N_SPR<X> Pass<X>(X val) =>
+    //    new N_SPR<X>(
+    //        new N_SPV<X>(val),
+    //        Fault);
 
     public bool Succeed() => ((ISP<T>)this).Value.Completed;
     public bool Succeed(out T result)
@@ -72,8 +77,8 @@ public struct N_SPR<T> : ISP<T>, ISPRConvertible<T>
     #endregion core funcs
 
     #region Operators
-    public static implicit operator N_SPR<T>(in T val) =>
-        new(val, default);
+    //public static implicit operator N_SPR<T>(in T val) =>
+    //    new(val, default);
 
     public static implicit operator N_SPR<T>(in N_SPF fault) =>
         new(fault);
@@ -87,7 +92,6 @@ public struct N_SPR<T> : ISP<T>, ISPRConvertible<T>
 #endif
     #endregion Operators
 }
-
 
 public struct N_DSPR<T> : IDSP<T, N_DSPR<T>, N_SPR<T>>, ISPRConvertible<N_SPR<T>>
 {
@@ -123,7 +127,7 @@ public struct N_DSPR<T> : IDSP<T, N_DSPR<T>, N_SPR<T>>, ISPRConvertible<N_SPR<T>
     public N_DSPR<X> Pass<X>(X val) =>
         new N_DSPR<X>(
             new N_SPV<X>(val),
-            Fault, 
+            Fault,
             ((IDSP)this).Disposables,
             ((IDSP)this).AsyncDisposables);
 
@@ -294,7 +298,7 @@ public struct N_TDSPR<T> : ITSP<T, N_TDSPR<T>, N_DSPR<T>>, IDSP<T, N_TDSPR<T>, N
     {
         ((ISP<T>)this).Value = value;
         Fault = fault;
-        ((ITSP)this).Transactions= transactions;
+        ((ITSP)this).Transactions = transactions;
         ((IDSP)this).Disposables = disposables;
         ((IDSP)this).AsyncDisposables = asyncDisposables;
     }

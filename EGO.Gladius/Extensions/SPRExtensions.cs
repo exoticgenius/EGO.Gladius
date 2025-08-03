@@ -102,22 +102,6 @@ public static class SPRExtensions
         }
     }
 
-    //public static async ValueTask<SPR<R>> Transform<T, R>(this ValueTask<SPR<T>> task, Func<T, Task<R>> del)
-    //{
-    //	var taskSPR = await task;
-    //	try
-    //	{
-    //		if (!taskSPR.Succeed(out var res))
-    //			return taskSPR.Fault;
-
-    //		return await del(res);
-    //	}
-    //	catch (Exception e)
-    //	{
-    //		return SPF.Gen(del.Method, [taskSPR.ExtractPayload()], e);
-    //	}
-    //}
-
     public static async ValueTask<SPR<R>> Transform<T, R>(this ValueTask<SPR<T>> task, Func<T, Task<SPR<R>>> del)
     {
         var taskSPR = await task;
