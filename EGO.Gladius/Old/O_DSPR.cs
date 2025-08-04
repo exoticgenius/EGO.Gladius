@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Transactions;
 
-namespace EGO.Gladius.DataTypes;
+namespace EGO.Gladius.Old;
 
 public struct O_TSPR<T>
 {
@@ -38,8 +38,8 @@ public struct O_TSPR<T>
         foreach (var item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
             {
-                if (Succeed())
-                    c.Complete();
+                //if (Succeed())
+                //    c.Complete();
                 c.Dispose();
             }
         return this;
@@ -420,17 +420,17 @@ public struct O_DSPR<T>
         return SPR;
     }
 
-    public O_DSPR<T> Pass(O_SPR<T> spr) =>
-        new(spr, Disposables, AsyncDisposables, Transactions);
+    public O_DSPR<T> Pass(O_SPR<T> spr) => throw new Exception();
+   //new (spr, Disposables, AsyncDisposables, Transactions);
 
-    public O_DSPR<R> Pass<R>(O_SPR<R> spr) =>
-        new(spr, Disposables, AsyncDisposables, Transactions);
+    public O_DSPR<R> Pass<R>(O_SPR<R> spr) => throw new Exception();
+    //new (spr, Disposables, AsyncDisposables, Transactions);
 
-    public O_DSPR<T> Pass(T val) =>
-        new(val, Disposables, AsyncDisposables, Transactions);
+    public O_DSPR<T> Pass(T val) => throw new Exception();
+    //new (val, Disposables, AsyncDisposables, Transactions);
 
-    public O_DSPR<R> Pass<R>(R val) =>
-        new(val, Disposables, AsyncDisposables, Transactions);
+    public O_DSPR<R> Pass<R>(R val) => throw new Exception();
+//        new(val, Disposables, AsyncDisposables, Transactions);
 
     public bool Faulted() =>
         SPR.Faulted();
@@ -450,22 +450,22 @@ public struct O_DSPR<T>
     public bool HasValue() =>
         SPR.HasValue();
 
-    public O_DSPR<T> Fault() =>
-        new(new(SPR.Fault), Disposables, AsyncDisposables, Transactions);
+    public O_DSPR<T> Fault() => throw new Exception();
+   // new (new(SPR.Fault), Disposables, AsyncDisposables, Transactions);
 
-    public O_DSPR<T> Fault(O_SPF fault) =>
-        new(new(fault), Disposables, AsyncDisposables, Transactions);
+    public O_DSPR<T> Fault(O_SPF fault) => throw new Exception();
+    //new (new(fault), Disposables, AsyncDisposables, Transactions);
 
-    public O_DSPR<R> Fault<R>() =>
-        new(new(SPR.Fault), Disposables, AsyncDisposables, Transactions);
+    public O_DSPR<R> Fault<R>() => throw new Exception();
+    //new (new(SPR.Fault), Disposables, AsyncDisposables, Transactions);
 
-    public O_DSPR<R> Fault<R>(O_SPF fault) =>
-        new(new(fault), Disposables, AsyncDisposables, Transactions);
+    public O_DSPR<R> Fault<R>(O_SPF fault) => throw new Exception();
+    //new (new(fault), Disposables, AsyncDisposables, Transactions);
 
-    public O_DVSP ToDVSP() =>
-        new(SPR.Fault, Disposables, AsyncDisposables, Transactions);
+    public O_DVSP ToDVSP() => throw new Exception();
+    //new (SPR.Fault, Disposables, AsyncDisposables, Transactions);
 
-    public O_DVSP ToDVSP(O_SPF fault) =>
-        new(fault, Disposables, AsyncDisposables, Transactions);
+    public O_DVSP ToDVSP(O_SPF fault) => throw new Exception();
+   // new (fault, Disposables, AsyncDisposables, Transactions);throw new Exception();
 
 }

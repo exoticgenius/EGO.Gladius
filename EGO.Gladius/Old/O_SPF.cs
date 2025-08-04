@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Text;
 
-namespace EGO.Gladius.DataTypes;
+namespace EGO.Gladius.Old;
 
 
 /// <summary>
@@ -72,8 +72,6 @@ public struct O_SPF
     public static O_SPF Gen(MethodInfo capturedContext, object[] parameters, Exception exception, string message) => new(capturedContext, parameters, exception, message);
     #endregion ' generators '
 
-    public void Throw() => throw new O_SPFE(this);
-    public O_SPFE GenSPFE() => new(this);
 
     private static bool WithFile;
 

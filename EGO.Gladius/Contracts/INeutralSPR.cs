@@ -1,1 +1,0 @@
-﻿namespace EGO.Gladius.Contracts;

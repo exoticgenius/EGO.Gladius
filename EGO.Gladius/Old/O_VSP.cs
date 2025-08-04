@@ -1,10 +1,11 @@
 ﻿using EGO.Gladius.Contracts;
+using EGO.Gladius.Old;
 
 using System.Diagnostics.CodeAnalysis;
 
 namespace EGO.Gladius.DataTypes;
 
-public struct O_VSP : ISP
+public struct O_VSP
 {
     public static readonly O_VSP Completed = new();
 

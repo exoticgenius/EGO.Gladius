@@ -1,12 +1,13 @@
 ﻿using EGO.Gladius.Contracts;
+using EGO.Gladius.DataTypes;
 
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace EGO.Gladius.DataTypes;
+namespace EGO.Gladius.Old;
 
-public struct O_SPR : ISP
+public struct O_SPR 
 {
     public static readonly O_SPR Completed = new();
 
@@ -163,7 +164,7 @@ public struct O_SPR : ISP
 /// and is not determinable until result qualification happens
 /// </summary>
 [DebuggerDisplay("{DebuggerPreview}")]
-public struct O_SPR<T> : ISP
+public struct O_SPR<T>
 {
     public static readonly O_SPR<T> Completed = new(default(T)!);
     private O_SPV<T> Value { get; }
@@ -525,12 +526,6 @@ public struct O_SPR<T> : ISP
 
     public O_DSPR<T> MarkDispose<E>(E index) where E : Enum =>
         new O_DSPR<T>(this).MarkDispose(index);
-
-    public O_DSPR<T> MarkScope(int index) =>
-        new O_DSPR<T>(this).MarkScope(index);
-
-    public O_DSPR<T> MarkScope<E>(E index) where E : Enum =>
-        new O_DSPR<T>(this).MarkScope(index);
 
     public bool Succeed() => Value.Completed;
 

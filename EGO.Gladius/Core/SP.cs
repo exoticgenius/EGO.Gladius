@@ -1,5 +1,6 @@
 ﻿using EGO.Gladius.Contracts;
 using EGO.Gladius.DataTypes;
+using EGO.Gladius.Old;
 
 using System.Collections.Concurrent;
 using System.Diagnostics;

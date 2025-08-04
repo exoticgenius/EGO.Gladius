@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace EGO.Gladius.Extensions;
+namespace EGO.Gladius.Old;
 
 public static class VSPExtensions
 {
