@@ -10,13 +10,13 @@ public static class SPR_Sync_To
         try
         {
             if (spr.Succeed())
-                return new SPR<R>(del(((ISP<T>)spr).Value.Payload));
+                return new SPR<R>(del(spr.Value.Payload));
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -25,13 +25,13 @@ public static class SPR_Sync_To
         try
         {
             if (spr.Succeed())
-                return del(((ISP<T>)spr).Value.Payload);
+                return del(spr.Value.Payload);
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -46,7 +46,7 @@ public static class SPR_Sync_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 }
@@ -57,13 +57,13 @@ public static class SPR_Sync_See
         try
         {
             if (spr.Succeed())
-                del(((ISP<T>)spr).Value.Payload);
+                del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -78,7 +78,7 @@ public static class SPR_Sync_See
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 }
@@ -91,13 +91,13 @@ public static class SPR_To_Async_To
         try
         {
             if (spr.Succeed())
-                return new SPR<R>(await del(((ISP<T>)spr).Value.Payload));
+                return new SPR<R>(await del(spr.Value.Payload));
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -106,13 +106,13 @@ public static class SPR_To_Async_To
         try
         {
             if (spr.Succeed())
-                return new SPR<R>(await del(((ISP<T>)spr).Value.Payload));
+                return new SPR<R>(await del(spr.Value.Payload));
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -122,13 +122,13 @@ public static class SPR_To_Async_To
         try
         {
             if (spr.Succeed())
-                return await del(((ISP<T>)spr).Value.Payload);
+                return await del(spr.Value.Payload);
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -137,12 +137,12 @@ public static class SPR_To_Async_To
         try
         {
             if (spr.Succeed())
-                return await del(((ISP<T>)spr).Value.Payload);
+                return await del(spr.Value.Payload);
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -158,7 +158,7 @@ public static class SPR_To_Async_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -173,7 +173,7 @@ public static class SPR_To_Async_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -189,7 +189,7 @@ public static class SPR_To_Async_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -203,7 +203,7 @@ public static class SPR_To_Async_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 }
@@ -214,13 +214,13 @@ public static class SPR_To_Async_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -229,13 +229,13 @@ public static class SPR_To_Async_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -250,7 +250,7 @@ public static class SPR_To_Async_See
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -264,7 +264,7 @@ public static class SPR_To_Async_See
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 }
@@ -278,13 +278,13 @@ public static class SPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return new SPR<R>(del(((ISP<T>)spr).Value.Payload));
+                return new SPR<R>(del(spr.Value.Payload));
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -294,13 +294,13 @@ public static class SPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return del(((ISP<T>)spr).Value.Payload);
+                return del(spr.Value.Payload);
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -316,7 +316,7 @@ public static class SPR_From_ValueTask_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -327,13 +327,13 @@ public static class SPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return new SPR<R>(await del(((ISP<T>)spr).Value.Payload));
+                return new SPR<R>(await del(spr.Value.Payload));
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -343,13 +343,13 @@ public static class SPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return await del(((ISP<T>)spr).Value.Payload);
+                return await del(spr.Value.Payload);
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -365,7 +365,7 @@ public static class SPR_From_ValueTask_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -376,13 +376,13 @@ public static class SPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return new SPR<R>(await del(((ISP<T>)spr).Value.Payload));
+                return new SPR<R>(await del(spr.Value.Payload));
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -392,13 +392,13 @@ public static class SPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return await del(((ISP<T>)spr).Value.Payload);
+                return await del(spr.Value.Payload);
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -414,7 +414,7 @@ public static class SPR_From_ValueTask_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 }
@@ -426,13 +426,13 @@ public static class SPR_From_ValueTask_See
         try
         {
             if (spr.Succeed())
-                del(((ISP<T>)spr).Value.Payload);
+                del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -448,7 +448,7 @@ public static class SPR_From_ValueTask_See
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -459,13 +459,13 @@ public static class SPR_From_ValueTask_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -481,7 +481,7 @@ public static class SPR_From_ValueTask_See
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -492,13 +492,13 @@ public static class SPR_From_ValueTask_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -514,7 +514,7 @@ public static class SPR_From_ValueTask_See
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 }
@@ -528,13 +528,13 @@ public static class SPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return new SPR<R>(del(((ISP<T>)spr).Value.Payload));
+                return new SPR<R>(del(spr.Value.Payload));
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -544,13 +544,13 @@ public static class SPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return del(((ISP<T>)spr).Value.Payload);
+                return del(spr.Value.Payload);
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -566,7 +566,7 @@ public static class SPR_From_Task_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -577,13 +577,13 @@ public static class SPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return new SPR<R>(await del(((ISP<T>)spr).Value.Payload));
+                return new SPR<R>(await del(spr.Value.Payload));
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -593,13 +593,13 @@ public static class SPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return await del(((ISP<T>)spr).Value.Payload);
+                return await del(spr.Value.Payload);
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -615,7 +615,7 @@ public static class SPR_From_Task_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -626,13 +626,13 @@ public static class SPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return new SPR<R>(await del(((ISP<T>)spr).Value.Payload));
+                return new SPR<R>(await del(spr.Value.Payload));
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -642,13 +642,13 @@ public static class SPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return await del(((ISP<T>)spr).Value.Payload);
+                return await del(spr.Value.Payload);
 
             return spr.Fault;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -664,7 +664,7 @@ public static class SPR_From_Task_To
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 }
@@ -676,13 +676,13 @@ public static class SPR_From_Task_See
         try
         {
             if (spr.Succeed())
-                del(((ISP<T>)spr).Value.Payload);
+                del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -698,7 +698,7 @@ public static class SPR_From_Task_See
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -709,13 +709,13 @@ public static class SPR_From_Task_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -731,7 +731,7 @@ public static class SPR_From_Task_See
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -742,13 +742,13 @@ public static class SPR_From_Task_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 
@@ -764,7 +764,7 @@ public static class SPR_From_Task_See
         }
         catch (Exception e)
         {
-            return SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e);
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
         }
     }
 }

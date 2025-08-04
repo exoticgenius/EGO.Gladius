@@ -10,13 +10,13 @@ public static class TDSPR_Sync_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -25,13 +25,13 @@ public static class TDSPR_Sync_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -46,7 +46,7 @@ public static class TDSPR_Sync_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 }
@@ -57,13 +57,13 @@ public static class TDSPR_Sync_See
         try
         {
             if (spr.Succeed())
-                del(((ISP<T>)spr).Value.Payload);
+                del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -78,7 +78,7 @@ public static class TDSPR_Sync_See
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 }
@@ -91,13 +91,13 @@ public static class TDSPR_To_Async_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -106,13 +106,13 @@ public static class TDSPR_To_Async_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -122,13 +122,13 @@ public static class TDSPR_To_Async_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -137,13 +137,13 @@ public static class TDSPR_To_Async_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -159,7 +159,7 @@ public static class TDSPR_To_Async_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -174,7 +174,7 @@ public static class TDSPR_To_Async_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -190,7 +190,7 @@ public static class TDSPR_To_Async_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -205,7 +205,7 @@ public static class TDSPR_To_Async_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 }
@@ -216,13 +216,13 @@ public static class TDSPR_To_Async_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -231,13 +231,13 @@ public static class TDSPR_To_Async_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -253,7 +253,7 @@ public static class TDSPR_To_Async_See
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -268,7 +268,7 @@ public static class TDSPR_To_Async_See
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 }
@@ -282,13 +282,13 @@ public static class TDSPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -298,13 +298,13 @@ public static class TDSPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -320,7 +320,7 @@ public static class TDSPR_From_ValueTask_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -331,13 +331,13 @@ public static class TDSPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -347,13 +347,13 @@ public static class TDSPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -369,7 +369,7 @@ public static class TDSPR_From_ValueTask_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -380,13 +380,13 @@ public static class TDSPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -396,13 +396,13 @@ public static class TDSPR_From_ValueTask_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -418,7 +418,7 @@ public static class TDSPR_From_ValueTask_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 }
@@ -430,13 +430,13 @@ public static class TDSPR_From_ValueTask_See
         try
         {
             if (spr.Succeed())
-                del(((ISP<T>)spr).Value.Payload);
+                del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -452,7 +452,7 @@ public static class TDSPR_From_ValueTask_See
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -463,13 +463,13 @@ public static class TDSPR_From_ValueTask_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -485,7 +485,7 @@ public static class TDSPR_From_ValueTask_See
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -496,13 +496,13 @@ public static class TDSPR_From_ValueTask_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -518,7 +518,7 @@ public static class TDSPR_From_ValueTask_See
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 }
@@ -532,13 +532,13 @@ public static class TDSPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -548,13 +548,13 @@ public static class TDSPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -570,7 +570,7 @@ public static class TDSPR_From_Task_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -581,13 +581,13 @@ public static class TDSPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -597,13 +597,13 @@ public static class TDSPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -619,7 +619,7 @@ public static class TDSPR_From_Task_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -630,13 +630,13 @@ public static class TDSPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -646,13 +646,13 @@ public static class TDSPR_From_Task_To
         try
         {
             if (spr.Succeed())
-                return spr.Pass(await del(((ISP<T>)spr).Value.Payload));
+                return spr.Pass(await del(spr.Value.Payload));
 
             return spr.Pass<R>(spr.Fault);
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -668,7 +668,7 @@ public static class TDSPR_From_Task_To
         }
         catch (Exception e)
         {
-            return spr.Pass<R>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 }
@@ -680,13 +680,13 @@ public static class TDSPR_From_Task_See
         try
         {
             if (spr.Succeed())
-                del(((ISP<T>)spr).Value.Payload);
+                del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -702,7 +702,7 @@ public static class TDSPR_From_Task_See
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -713,13 +713,13 @@ public static class TDSPR_From_Task_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -735,7 +735,7 @@ public static class TDSPR_From_Task_See
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -746,13 +746,13 @@ public static class TDSPR_From_Task_See
         try
         {
             if (spr.Succeed())
-                await del(((ISP<T>)spr).Value.Payload);
+                await del(spr.Value.Payload);
 
             return spr;
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 
@@ -768,7 +768,7 @@ public static class TDSPR_From_Task_See
         }
         catch (Exception e)
         {
-            return spr.Pass<T>(SPF.Gen(del.Method, [((ISP<T>)spr).Value.Payload], e));
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
 }

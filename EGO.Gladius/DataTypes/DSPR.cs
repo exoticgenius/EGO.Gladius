@@ -11,13 +11,12 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     #region props
     List<KeyValuePair<short, IDisposable>>? _disposables;
     List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
-    private SPV<T> _value;
 
     List<KeyValuePair<short, IDisposable>>? IDSP.Disposables => _disposables;
     List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables => _asyncDisposables;
 
     public SPF Fault { get; set; }
-    SPV<T> ISP<T>.Value => _value;
+    internal SPV<T> Value { get; }
     #endregion props
 
     #region ctors
@@ -31,7 +30,7 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
         List<KeyValuePair<short, IDisposable>>? disposables,
         List<KeyValuePair<short, IAsyncDisposable>>? asyncDisposables)
     {
-        _value = value;
+        Value = value;
         Fault = fault;
         _disposables = disposables;
         _asyncDisposables = asyncDisposables;
@@ -47,7 +46,7 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
             Fault,
             ((IDSP)this).Disposables,
             ((IDSP)this).AsyncDisposables);
-    public bool HasValue() => _value.HasValue();
+    public bool HasValue() => Value.HasValue();
 
     public DSPR<X> Pass<X>(X val) =>
         new DSPR<X>(
@@ -58,7 +57,7 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
 
     public DSPR<X> Pass<X>(SPR<X> spr) =>
         new DSPR<X>(
-            ((ISP<X>)spr).Value,
+            spr.Value,
             spr.Fault,
             ((IDSP)this).Disposables,
             ((IDSP)this).AsyncDisposables);
@@ -70,8 +69,33 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
             ((IDSP)this).Disposables,
             ((IDSP)this).AsyncDisposables);
 
-    public bool Succeed() => ((ISP<T>)this).Value.Completed;
-    public bool Faulted() => !((ISP<T>)this).Value.Completed;
+    public bool Succeed() => Value.Completed;
+    public bool Faulted() => !Value.Completed;
+
+    public bool Succeed(out T result)
+    {
+        if (Value.Completed)
+        {
+            result = Value.Payload;
+            return true;
+        }
+
+        result = default!;
+        return false;
+    }
+
+    public bool Faulted(out SPF fault)
+    {
+        if (!Value.Completed)
+        {
+            fault = Fault;
+            return true;
+        }
+
+        fault = default;
+        return false;
+    }
+
     #endregion core funcs
 
     #region disposal
@@ -93,7 +117,7 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     {
         ((IDSP<T, DSPR<T>, SPR<T>>)this).InternalDisposeAll();
 
-        return new SPR<T>(((ISP<T>)this).Value, Fault);
+        return new SPR<T>(Value, Fault);
     }
     #endregion disposal
 

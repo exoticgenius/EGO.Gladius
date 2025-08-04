@@ -11,12 +11,11 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
 {
     #region props
     List<KeyValuePair<short, TransactionScope>>? _transactions;
-    private SPV<T> _value;
 
     List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions => _transactions;
 
     public SPF Fault { get; set; }
-    SPV<T> ISP<T>.Value => _value;
+    internal SPV<T> Value { get; }
     #endregion props
 
     #region ctors
@@ -28,7 +27,7 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
         SPF fault,
         List<KeyValuePair<short, TransactionScope>>? transactions)
     {
-        _value = val;
+        Value = val;
         Fault = fault;
         _transactions = transactions;
     }
@@ -42,7 +41,7 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
             Succeed(),
             Fault,
             ((ITSP)this).Transactions);
-    public bool HasValue() => _value.HasValue();
+    public bool HasValue() => Value.HasValue();
 
     public TSPR<X> Pass<X>(X val) =>
         new TSPR<X>(
@@ -52,7 +51,7 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
 
     public TSPR<X> Pass<X>(SPR<X> spr) =>
         new TSPR<X>(
-            ((ISP<X>)spr).Value,
+            spr.Value,
             spr.Fault,
             ((ITSP)this).Transactions);
 
@@ -62,8 +61,33 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
             fault,
             ((ITSP)this).Transactions);
 
-    public bool Succeed() => ((ISP<T>)this).Value.Completed;
-    public bool Faulted() => !((ISP<T>)this).Value.Completed;
+    public bool Succeed() => Value.Completed;
+    public bool Faulted() => !Value.Completed;
+
+    public bool Succeed(out T result)
+    {
+        if (Value.Completed)
+        {
+            result = Value.Payload;
+            return true;
+        }
+
+        result = default!;
+        return false;
+    }
+
+    public bool Faulted(out SPF fault)
+    {
+        if (!Value.Completed)
+        {
+            fault = Fault;
+            return true;
+        }
+
+        fault = default;
+        return false;
+    }
+
     #endregion core funcs
 
     #region transactional
@@ -90,13 +114,13 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     {
         ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalCompleteAllScopes();
 
-        return new SPR<T>(((ISP<T>)this).Value, Fault);
+        return new SPR<T>(Value, Fault);
     }
     public SPR<T> DisposeAllScopes()
     {
         ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalDisposeAllScopes();
 
-        return new SPR<T>(((ISP<T>)this).Value, Fault);
+        return new SPR<T>(Value, Fault);
     }
     #endregion transactional
 

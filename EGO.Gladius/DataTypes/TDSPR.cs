@@ -13,14 +13,13 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
     List<KeyValuePair<short, TransactionScope>>? _transactions;
     List<KeyValuePair<short, IDisposable>>? _disposables;
     List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
-    private SPV<T> _value;
 
     List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions => _transactions;
     List<KeyValuePair<short, IDisposable>>? IDSP.Disposables => _disposables;
     List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables => _asyncDisposables;
 
     public SPF Fault { get; set; }
-    SPV<T> ISP<T>.Value => _value;
+    internal SPV<T> Value { get; }
     #endregion props
 
     #region ctors
@@ -34,7 +33,7 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
        List<KeyValuePair<short, IDisposable>>? disposables,
        List<KeyValuePair<short, IAsyncDisposable>>? asyncDisposables)
     {
-        _value = value;
+        Value = value;
         Fault = fault;
         _transactions = transactions;
         _disposables = disposables;
@@ -53,7 +52,7 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
             ((ITSP)this).Transactions,
             ((IDSP)this).Disposables,
             ((IDSP)this).AsyncDisposables);
-    public bool HasValue() => _value.HasValue();
+    public bool HasValue() => Value.HasValue();
 
     public TDSPR<X> Pass<X>(X val) =>
         new TDSPR<X>(
@@ -65,7 +64,7 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
 
     public TDSPR<X> Pass<X>(SPR<X> spr) =>
         new TDSPR<X>(
-            ((ISP<X>)spr).Value,
+            spr.Value,
             spr.Fault,
             ((ITSP)this).Transactions,
             ((IDSP)this).Disposables,
@@ -79,8 +78,33 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
             ((IDSP)this).Disposables,
             ((IDSP)this).AsyncDisposables);
 
-    public bool Succeed() => ((ISP<T>)this).Value.Completed;
-    public bool Faulted() => !((ISP<T>)this).Value.Completed;
+    public bool Succeed() => Value.Completed;
+    public bool Faulted() => !Value.Completed;
+
+    public bool Succeed(out T result)
+    {
+        if (Value.Completed)
+        {
+            result = Value.Payload;
+            return true;
+        }
+
+        result = default!;
+        return false;
+    }
+
+    public bool Faulted(out SPF fault)
+    {
+        if (!Value.Completed)
+        {
+            fault = Fault;
+            return true;
+        }
+
+        fault = default;
+        return false;
+    }
+
     #endregion core funcs
 
     #region disposal
@@ -103,7 +127,7 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
         ((IDSP<T, TDSPR<T>, TSPR<T>>)this).InternalDisposeAll();
 
         return new TSPR<T>(
-            ((ISP<T>)this).Value,
+            Value,
             Fault,
             ((ITSP<T, TDSPR<T>, DSPR<T>>)this).Transactions);
     }
@@ -134,20 +158,20 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
         ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalCompleteAllScopes();
 
         return new DSPR<T>(
-            ((ISP<T>)this).Value,
+            Value,
             Fault,
-            ((IDSP<T, TDSPR<T>, TSPR<T>>)this).Disposables,
-            ((IDSP<T, TDSPR<T>, TSPR<T>>)this).AsyncDisposables);
+            ((IDSP)this).Disposables,
+            ((IDSP)this).AsyncDisposables);
     }
     public DSPR<T> DisposeAllScopes()
     {
         ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalDisposeAllScopes();
 
         return new DSPR<T>(
-            ((ISP<T>)this).Value,
+            Value,
             Fault,
-            ((IDSP<T, TDSPR<T>, TSPR<T>>)this).Disposables,
-            ((IDSP<T, TDSPR<T>, TSPR<T>>)this).AsyncDisposables);
+            ((IDSP)this).Disposables,
+            ((IDSP)this).AsyncDisposables);
     }
     #endregion transactional
 

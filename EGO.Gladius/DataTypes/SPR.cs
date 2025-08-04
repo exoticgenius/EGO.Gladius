@@ -202,9 +202,8 @@ public struct SPR : ISP
 public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
 {
     #region props
-    private SPV<T> _value;
     public SPF Fault { get; }
-    SPV<T> ISP<T>.Value => _value;
+    internal SPV<T> Value { get; }
     #endregion props
 
     #region ctors
@@ -213,22 +212,22 @@ public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
     }
     internal SPR(SPF fault)
     {
-        _value = default;
+        Value = default;
         Fault = fault;
     }
     internal SPR(T payload)
     {
-        _value = new SPV<T>(payload);
+        Value = new SPV<T>(payload);
         Fault = default;
     }
     internal SPR(SPV<T> val, SPF fault)
     {
-        _value = val;
+        Value = val;
         Fault = fault;
     }
     internal SPR(T payload, SPF fault)
     {
-        _value = new SPV<T>(payload);
+        Value = new SPV<T>(payload);
         Fault = fault;
     }
     #endregion ctors
@@ -236,13 +235,38 @@ public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
     #region core funcs
     public T Descend() =>
         Succeed() ?
-        ((ISP<T>)this).Value.Payload :
+        Value.Payload :
         throw Fault.GenSPFE();
     public VSP Void() => new VSP(Succeed(), Fault);
-    public bool HasValue() => _value.HasValue();
+    public bool HasValue() => Value.HasValue();
 
-    public bool Succeed() => ((ISP<T>)this).Value.Completed;
-    public bool Faulted() => !((ISP<T>)this).Value.Completed;
+    public bool Succeed() => Value.Completed;
+    public bool Faulted() => !Value.Completed;
+
+    public bool Succeed(out T result)
+    {
+        if (Value.Completed)
+        {
+            result = Value.Payload;
+            return true;
+        }
+
+        result = default!;
+        return false;
+    }
+
+    public bool Faulted(out SPF fault)
+    {
+        if (!Value.Completed)
+        {
+            fault = Fault;
+            return true;
+        }
+
+        fault = default;
+        return false;
+    }
+
     #endregion core funcs
 
     #region Operators
