@@ -3083,32 +3083,3 @@ public static class TDSPR_From_Task_See
         }
     }
 }
-
-public static class ALL_To_VSP
-{
-    public static VSP Void<T>(this SPR<T> spr)
-    {
-        return new VSP(spr.Succeed(), spr.Fault);
-    }
-
-    public static DVSP Void<T>(this DSPR<T> spr)
-    {
-        return new DVSP(spr.Succeed(), spr.Fault);
-    }
-
-    public static TVSP Void<T>(this TSPR<T> spr)
-    {
-        return new TVSP(spr.Succeed(), spr.Fault);
-    }
-
-    public static TDVSP Void<T>(this TDSPR<T> spr)
-    {
-        return new TDVSP(spr.Succeed(), spr.Fault);
-    }
-
-
-    public static VSP Void<T>(this SPR<T> spr)
-    {
-        return new VSP(spr.Succeed(), spr.Fault);
-    }
-}

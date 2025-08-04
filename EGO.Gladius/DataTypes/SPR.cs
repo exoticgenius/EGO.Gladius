@@ -3,6 +3,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Transactions;
 
 namespace EGO.Gladius.DataTypes;
@@ -124,7 +125,7 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     #region core funcs
     public SPR<T> Descend() =>
         DisposeAll();
-    public DVSP Void() => 
+    public DVSP Void() =>
         new DVSP(
             Succeed(),
             Fault,
@@ -534,6 +535,8 @@ public struct VSP : ISP
     #region operators
     public static implicit operator VSP(in SPF fault) =>
         new(fault);
+    public static implicit operator VSP(in SPR tag) =>
+        new(true, default);
     #endregion operators
 
     #region utils
@@ -872,4 +875,159 @@ public struct TDVSP : ITSP, IDSP, ISPRDescendable<VSP>
     }
 #endif
     #endregion utils
+}
+
+
+public struct SPR : ISP
+{
+    public readonly static SPR Completed = new();
+    private readonly static SPF _fault = new SPF();
+
+    public SPF Fault => _fault;
+
+    public static SPR<T> FromResult<T>(T item) => new(item);
+
+    public bool Succeed() => true;
+
+    public bool Faulted() => false;
+
+    public static SPR<T> Gen<T>(T val) => new SPR<T>(val);
+
+    public static async ValueTask<VSP> Gen(Task<VSP> val)
+    {
+        try
+        {
+            return await val;
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(e);
+        }
+    }
+
+    public static async ValueTask<VSP> Gen(Task val)
+    {
+        try
+        {
+            await val;
+
+            return Completed;
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(e);
+        }
+    }
+
+    public static async ValueTask<VSP> Gen(ValueTask val)
+    {
+        try
+        {
+            await val;
+
+            return Completed;
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(e);
+        }
+    }
+
+    public static async ValueTask<VSP> Gen(ValueTask<VSP> val)
+    {
+        try
+        {
+            return await val;
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(e);
+        }
+    }
+
+    public static async Task<SPR<T>> Run<T>([NotNull] Func<Task<T>> del)
+    {
+        try
+        {
+            return new SPR<T>(await del());
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(del.Method, e);
+        }
+    }
+
+    public static async Task<SPR<T>> TryFor<T>([NotNull] Func<Task<T>> source, int tryFor)
+    {
+        Exception caught = null;
+        while (tryFor != 0)
+        {
+            try
+            {
+                --tryFor;
+                return new SPR<T>(await source());
+            }
+            catch (Exception e)
+            {
+                caught = e;
+            }
+        }
+
+        return SPF.Gen(caught);
+    }
+
+    public static async Task<SPR<T>> TryFor<T>([NotNull] Func<Task<SPR<T>>> source, int tryFor)
+    {
+        SPF? lastSPF = null;
+
+        while (tryFor != 0)
+        {
+            --tryFor;
+            var res = await source();
+
+            if (res.Succeed())
+                return res;
+
+            lastSPF = res.Fault;
+        }
+
+        return lastSPF ?? SPF.Gen("fault running source");
+    }
+
+    public static async Task<SPR<T>> TryFor<T>([NotNull] Func<Task<SPR<T>>> source, CancellationToken ct)
+    {
+        SPF? lastSPF = null;
+
+        while (!ct.IsCancellationRequested)
+        {
+            var res = await source();
+
+            if (res.Succeed())
+                return res;
+
+            lastSPF = res.Fault;
+        }
+
+        return lastSPF ?? SPF.Gen("fault running source");
+    }
+
+    public static async Task<SPR<T>> TryFor<T>([NotNull] Func<Task<SPR<T>>> source, TimeSpan timeout)
+    {
+        SPF? lastSPF = null;
+        var sw = Stopwatch.StartNew();
+
+        while (sw.Elapsed < timeout)
+        {
+            var res = await source();
+
+            if (res.Succeed())
+                return res;
+
+            lastSPF = res.Fault;
+        }
+
+        sw.Stop();
+
+        return lastSPF ?? SPF.Gen("fault running source");
+    }
 }
