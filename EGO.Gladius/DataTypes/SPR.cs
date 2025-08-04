@@ -45,36 +45,8 @@ public struct SPR<T> : ISP<T>, ISPRConvertible<T>
         ((ISP<T>)this).Value.Payload :
         throw Fault.GenSPFE();
 
-    //public N_SPR<X> Pass<X>(X val) =>
-    //    new N_SPR<X>(
-    //        new N_SPV<X>(val),
-    //        Fault);
-
     public bool Succeed() => ((ISP<T>)this).Value.Completed;
-    public bool Succeed(out T result)
-    {
-        if (((ISP<T>)this).Value.Completed)
-        {
-            result = ((ISP<T>)this).Value.Payload;
-            return true;
-        }
-
-        result = default!;
-        return false;
-    }
-
     public bool Faulted() => !((ISP<T>)this).Value.Completed;
-    public bool Faulted(out SPF fault)
-    {
-        if (!((ISP<T>)this).Value.Completed)
-        {
-            fault = Fault;
-            return true;
-        }
-
-        fault = default;
-        return false;
-    }
     #endregion core funcs
 
     #region Operators
@@ -151,30 +123,7 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
             ((IDSP)this).AsyncDisposables);
 
     public bool Succeed() => ((ISP<T>)this).Value.Completed;
-    public bool Succeed(out T result)
-    {
-        if (((ISP<T>)this).Value.Completed)
-        {
-            result = ((ISP<T>)this).Value.Payload;
-            return true;
-        }
-
-        result = default!;
-        return false;
-    }
-
     public bool Faulted() => !((ISP<T>)this).Value.Completed;
-    public bool Faulted(out SPF fault)
-    {
-        if (!((ISP<T>)this).Value.Completed)
-        {
-            fault = Fault;
-            return true;
-        }
-
-        fault = default;
-        return false;
-    }
     #endregion core funcs
 
     #region disposal
@@ -199,22 +148,6 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
         return new SPR<T>(((ISP<T>)this).Value, Fault);
     }
     #endregion disposal
-
-    #region Operators
-    //public static implicit operator N_SPR<T>(in T val) =>
-    //    new(val, default);
-
-    //public static implicit operator DSPR<T>(in SPF fault) =>
-    //    new(new SPV<T>(), fault, default, default);
-
-
-#if Release
-    public override string ToString()
-    {
-        throw new Exception("calling ToString on SPR<> object is impossible");
-    }
-#endif
-    #endregion Operators
 }
 
 public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
@@ -267,30 +200,7 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
             ((ITSP)this).Transactions);
 
     public bool Succeed() => ((ISP<T>)this).Value.Completed;
-    public bool Succeed(out T result)
-    {
-        if (((ISP<T>)this).Value.Completed)
-        {
-            result = ((ISP<T>)this).Value.Payload;
-            return true;
-        }
-
-        result = default!;
-        return false;
-    }
-
     public bool Faulted() => !((ISP<T>)this).Value.Completed;
-    public bool Faulted(out SPF fault)
-    {
-        if (!((ISP<T>)this).Value.Completed)
-        {
-            fault = Fault;
-            return true;
-        }
-
-        fault = default;
-        return false;
-    }
     #endregion core funcs
 
     #region transactional
@@ -393,30 +303,7 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
             ((IDSP)this).AsyncDisposables);
 
     public bool Succeed() => ((ISP<T>)this).Value.Completed;
-    public bool Succeed(out T result)
-    {
-        if (((ISP<T>)this).Value.Completed)
-        {
-            result = ((ISP<T>)this).Value.Payload;
-            return true;
-        }
-
-        result = default!;
-        return false;
-    }
-
     public bool Faulted() => !((ISP<T>)this).Value.Completed;
-    public bool Faulted(out SPF fault)
-    {
-        if (!((ISP<T>)this).Value.Completed)
-        {
-            fault = Fault;
-            return true;
-        }
-
-        fault = default;
-        return false;
-    }
     #endregion core funcs
 
     #region disposal
@@ -518,20 +405,7 @@ public struct VSP : ISP
 
     #region core funcs
     public bool Succeed() => Success;
-
     public bool Faulted() => !Success;
-
-    public bool Faulted(out SPF fault)
-    {
-        if (!Success)
-        {
-            fault = Fault;
-            return true;
-        }
-
-        fault = default;
-        return false;
-    }
     #endregion core funcs
 
     #region operators
@@ -591,19 +465,7 @@ public struct DVSP : IDSP, ISPRConvertible<VSP>
     //        ((IDSP)this).AsyncDisposables);
 
     public bool Succeed() => Success;
-
     public bool Faulted() => !Success;
-    public bool Faulted(out SPF fault)
-    {
-        if (!Success)
-        {
-            fault = Fault;
-            return true;
-        }
-
-        fault = default;
-        return false;
-    }
     #endregion core funcs
 
     #region disposal
@@ -666,19 +528,7 @@ public struct TVSP : ITSP, ISPRConvertible<VSP>
     //        ((ITSP)this).Transactions);
 
     public bool Succeed() => Success;
-
     public bool Faulted() => !Success;
-    public bool Faulted(out SPF fault)
-    {
-        if (!Success)
-        {
-            fault = Fault;
-            return true;
-        }
-
-        fault = default;
-        return false;
-    }
     #endregion core funcs
 
     #region transactional
@@ -761,20 +611,7 @@ public struct TDVSP : ITSP, IDSP, ISPRConvertible<VSP>
     //        ((IDSP)this).AsyncDisposables);
 
     public bool Succeed() => Success;
-
-
     public bool Faulted() => !Success;
-    public bool Faulted(out SPF fault)
-    {
-        if (!Success)
-        {
-            fault = Fault;
-            return true;
-        }
-
-        fault = default;
-        return false;
-    }
     #endregion core funcs
 
     #region disposal

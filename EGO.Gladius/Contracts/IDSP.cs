@@ -3130,7 +3130,6 @@ public interface ISP<T> : ISP
 {
     internal SPV<T> Value { get; }
 
-    public new bool Succeed() => Value.Completed;
     public bool Succeed(out T result)
     {
         if (Value.Completed)
@@ -3143,7 +3142,6 @@ public interface ISP<T> : ISP
         return false;
     }
 
-    public new bool Faulted() => !Value.Completed;
     public bool Faulted(out SPF fault)
     {
         if (!Value.Completed)
