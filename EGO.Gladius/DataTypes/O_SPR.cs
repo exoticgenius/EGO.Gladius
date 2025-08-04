@@ -18,8 +18,6 @@ public struct O_SPR : ISP
 
     public static O_SPR<T> Gen<T>(T val) => val;
 
-    public static O_VSP Gen(O_VSP val) => val;
-
     public static async ValueTask<O_VSP> Gen(Task<O_VSP> val)
     {
         try

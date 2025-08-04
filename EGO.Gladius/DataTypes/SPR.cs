@@ -1,11 +1,14 @@
 ﻿using EGO.Gladius.Contracts;
 
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Transactions;
 
 namespace EGO.Gladius.DataTypes;
 
-public struct SPR<T> : ISP<T>, ISPRConvertible<T>
+[DebuggerDisplay("{DebuggerPreview}")]
+public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
 {
     #region props
     private SPV<T> _value;
@@ -44,6 +47,8 @@ public struct SPR<T> : ISP<T>, ISPRConvertible<T>
         Succeed() ?
         ((ISP<T>)this).Value.Payload :
         throw Fault.GenSPFE();
+    public VSP Void() => new VSP(Succeed(), Fault);
+    public bool HasValue() => _value.HasValue();
 
     public bool Succeed() => ((ISP<T>)this).Value.Completed;
     public bool Faulted() => !((ISP<T>)this).Value.Completed;
@@ -55,18 +60,36 @@ public struct SPR<T> : ISP<T>, ISPRConvertible<T>
 
     public static implicit operator SPR<T>(in SPF fault) =>
         new(fault);
+    #endregion Operators
 
+    #region utils
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    private object? DebuggerPreview
+    {
+        get
+        {
+            if (!((ISP<T>)this).Succeed(out var val))
+                return Fault.Message ??
+                    Fault.Exception?.Message ??
+                    "Result Faulted";
+
+            return val;
+        }
+    }
 
 #if Release
     public override string ToString()
     {
-        throw new Exception("calling ToString on SPR<> object is impossible");
+        throw new Exception("Calling ToStringon ISP object is impossible");
     }
 #endif
-    #endregion Operators
+    #endregion utils
 }
 
-public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
+[DebuggerDisplay("{DebuggerPreview}")]
+public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRVoidable<DVSP>
 {
     #region props
     List<KeyValuePair<short, IDisposable>>? _disposables;
@@ -101,6 +124,14 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
     #region core funcs
     public SPR<T> Descend() =>
         DisposeAll();
+    public DVSP Void() => 
+        new DVSP(
+            Succeed(),
+            Fault,
+            ((IDSP)this).Disposables,
+            ((IDSP)this).AsyncDisposables);
+    public bool HasValue() => _value.HasValue();
+
     public DSPR<X> Pass<X>(X val) =>
         new DSPR<X>(
             new SPV<X>(val),
@@ -148,9 +179,35 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
         return new SPR<T>(((ISP<T>)this).Value, Fault);
     }
     #endregion disposal
+
+    #region utils
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    private object? DebuggerPreview
+    {
+        get
+        {
+            if (!((ISP<T>)this).Succeed(out var val))
+                return Fault.Message ??
+                    Fault.Exception?.Message ??
+                    "Result Faulted";
+
+            return val;
+        }
+    }
+
+#if Release
+    public override string ToString()
+    {
+        throw new Exception("Calling ToStringon ISP object is impossible");
+    }
+#endif
+    #endregion utils
 }
 
-public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
+[DebuggerDisplay("{DebuggerPreview}")]
+public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRVoidable<TVSP>
 {
     #region props
     List<KeyValuePair<short, TransactionScope>>? _transactions;
@@ -180,6 +237,12 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
     #region core funcs
     public SPR<T> Descend() =>
         CompleteAllScopes();
+    public TVSP Void() =>
+        new TVSP(
+            Succeed(),
+            Fault,
+            ((ITSP)this).Transactions);
+    public bool HasValue() => _value.HasValue();
 
     public TSPR<X> Pass<X>(X val) =>
         new TSPR<X>(
@@ -236,9 +299,35 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
         return new SPR<T>(((ISP<T>)this).Value, Fault);
     }
     #endregion transactional
+
+    #region utils
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    private object? DebuggerPreview
+    {
+        get
+        {
+            if (!((ISP<T>)this).Succeed(out var val))
+                return Fault.Message ??
+                    Fault.Exception?.Message ??
+                    "Result Faulted";
+
+            return val;
+        }
+    }
+
+#if Release
+    public override string ToString()
+    {
+        throw new Exception("Calling ToStringon ISP object is impossible");
+    }
+#endif
+    #endregion utils
 }
 
-public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>, ISPRConvertible<SPR<T>>
+[DebuggerDisplay("{DebuggerPreview}")]
+public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>, ISPRDescendable<SPR<T>>, ISPRVoidable<TDVSP>
 {
     #region props
     List<KeyValuePair<short, TransactionScope>>? _transactions;
@@ -277,6 +366,14 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
     public SPR<T> Descend() =>
         CompleteAllScopes()
         .DisposeAll();
+    public TDVSP Void() =>
+        new TDVSP(
+            Succeed(),
+            Fault,
+            ((ITSP)this).Transactions,
+            ((IDSP)this).Disposables,
+            ((IDSP)this).AsyncDisposables);
+    public bool HasValue() => _value.HasValue();
 
     public TDSPR<X> Pass<X>(X val) =>
         new TDSPR<X>(
@@ -373,9 +470,35 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
             ((IDSP<T, TDSPR<T>, TSPR<T>>)this).AsyncDisposables);
     }
     #endregion transactional
+
+    #region utils
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    private object? DebuggerPreview
+    {
+        get
+        {
+            if (!((ISP<T>)this).Succeed(out var val))
+                return Fault.Message ??
+                    Fault.Exception?.Message ??
+                    "Result Faulted";
+
+            return val;
+        }
+    }
+
+#if Release
+    public override string ToString()
+    {
+        throw new Exception("Calling ToStringon ISP object is impossible");
+    }
+#endif
+    #endregion utils
 }
 
 
+[DebuggerDisplay("{DebuggerPreview}")]
 public struct VSP : ISP
 {
     #region props
@@ -412,9 +535,35 @@ public struct VSP : ISP
     public static implicit operator VSP(in SPF fault) =>
         new(fault);
     #endregion operators
+
+    #region utils
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    private object? DebuggerPreview
+    {
+        get
+        {
+            if (!Succeed())
+                return Fault.Message ??
+                    Fault.Exception?.Message ??
+                    "Operation Faulted";
+
+            return "Successfuly Executed";
+        }
+    }
+
+#if Release
+    public override string ToString()
+    {
+        throw new Exception("Calling ToStringon ISP object is impossible");
+    }
+#endif
+    #endregion utils
 }
 
-public struct DVSP : IDSP, ISPRConvertible<VSP>
+[DebuggerDisplay("{DebuggerPreview}")]
+public struct DVSP : IDSP, ISPRDescendable<VSP>
 {
     #region props
     List<KeyValuePair<short, IDisposable>>? _disposables;
@@ -457,13 +606,6 @@ public struct DVSP : IDSP, ISPRConvertible<VSP>
     public VSP Descend() =>
         DisposeAll();
 
-    //public DSPR<X> Pass<X>(X val) =>
-    //    new DSPR<X>(
-    //        new SPV<X>(val),
-    //        Fault,
-    //        ((IDSP)this).Disposables,
-    //        ((IDSP)this).AsyncDisposables);
-
     public bool Succeed() => Success;
     public bool Faulted() => !Success;
     #endregion core funcs
@@ -482,9 +624,35 @@ public struct DVSP : IDSP, ISPRConvertible<VSP>
         return new VSP(Success, Fault);
     }
     #endregion disposal
+
+    #region utils
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    private object? DebuggerPreview
+    {
+        get
+        {
+            if (!Succeed())
+                return Fault.Message ??
+                    Fault.Exception?.Message ??
+                    "Operation Faulted";
+
+            return "Successfuly Executed";
+        }
+    }
+
+#if Release
+    public override string ToString()
+    {
+        throw new Exception("Calling ToStringon ISP object is impossible");
+    }
+#endif
+    #endregion utils
 }
 
-public struct TVSP : ITSP, ISPRConvertible<VSP>
+[DebuggerDisplay("{DebuggerPreview}")]
+public struct TVSP : ITSP, ISPRDescendable<VSP>
 {
     #region props
     List<KeyValuePair<short, TransactionScope>>? _transactions;
@@ -521,12 +689,6 @@ public struct TVSP : ITSP, ISPRConvertible<VSP>
     public VSP Descend() =>
         CompleteAllScopes();
 
-    //public TSPR<X> Pass<X>(X val) =>
-    //    new TSPR<X>(
-    //        new SPV<X>(val),
-    //        Fault,
-    //        ((ITSP)this).Transactions);
-
     public bool Succeed() => Success;
     public bool Faulted() => !Success;
     #endregion core funcs
@@ -557,9 +719,35 @@ public struct TVSP : ITSP, ISPRConvertible<VSP>
         return new VSP(Success, Fault);
     }
     #endregion transactional
+
+    #region utils
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    private object? DebuggerPreview
+    {
+        get
+        {
+            if (!Succeed())
+                return Fault.Message ??
+                    Fault.Exception?.Message ??
+                    "Operation Faulted";
+
+            return "Successfuly Executed";
+        }
+    }
+
+#if Release
+    public override string ToString()
+    {
+        throw new Exception("Calling ToStringon ISP object is impossible");
+    }
+#endif
+    #endregion utils
 }
 
-public struct TDVSP : ITSP, IDSP, ISPRConvertible<VSP>
+[DebuggerDisplay("{DebuggerPreview}")]
+public struct TDVSP : ITSP, IDSP, ISPRDescendable<VSP>
 {
     #region props
     List<KeyValuePair<short, TransactionScope>>? _transactions;
@@ -602,13 +790,6 @@ public struct TDVSP : ITSP, IDSP, ISPRConvertible<VSP>
     public VSP Descend() =>
         CompleteAllScopes()
         .DisposeAll();
-    //public TDSPR<X> Pass<X>(X val) =>
-    //    new TDSPR<X>(
-    //        new SPV<X>(val),
-    //        Fault,
-    //        ((ITSP)this).Transactions,
-    //        ((IDSP)this).Disposables,
-    //        ((IDSP)this).AsyncDisposables);
 
     public bool Succeed() => Success;
     public bool Faulted() => !Success;
@@ -666,4 +847,29 @@ public struct TDVSP : ITSP, IDSP, ISPRConvertible<VSP>
             ((IDSP)this).AsyncDisposables);
     }
     #endregion transactional
+
+    #region utils
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    private object? DebuggerPreview
+    {
+        get
+        {
+            if (!Succeed())
+                return Fault.Message ??
+                    Fault.Exception?.Message ??
+                    "Operation Faulted";
+
+            return "Successfuly Executed";
+        }
+    }
+
+#if Release
+    public override string ToString()
+    {
+        throw new Exception("Calling ToStringon ISP object is impossible");
+    }
+#endif
+    #endregion utils
 }
