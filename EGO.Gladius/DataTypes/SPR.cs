@@ -1,5 +1,6 @@
 ﻿using EGO.Gladius.Contracts;
 
+using System;
 using System.Transactions;
 
 namespace EGO.Gladius.DataTypes;
@@ -7,8 +8,9 @@ namespace EGO.Gladius.DataTypes;
 public struct SPR<T> : ISP<T>, ISPRConvertible<T>
 {
     #region props
-    SPV<T> ISP<T>.Value { get; set; }
+    private SPV<T> _value;
     public SPF Fault { get; }
+    SPV<T> ISP<T>.Value => _value;
     #endregion props
 
     #region ctors
@@ -17,22 +19,22 @@ public struct SPR<T> : ISP<T>, ISPRConvertible<T>
     }
     internal SPR(SPF fault)
     {
-        ((ISP<T>)this).Value = default;
+        _value = default;
         Fault = fault;
     }
     internal SPR(T payload)
     {
-        ((ISP<T>)this).Value = new SPV<T>(payload);
+        _value = new SPV<T>(payload);
         Fault = default;
     }
     internal SPR(SPV<T> val, SPF fault)
     {
-        ((ISP<T>)this).Value = val;
+        _value = val;
         Fault = fault;
     }
     internal SPR(T payload, SPF fault)
     {
-        ((ISP<T>)this).Value = new SPV<T>(payload);
+        _value = new SPV<T>(payload);
         Fault = fault;
     }
     #endregion ctors
@@ -95,28 +97,32 @@ public struct SPR<T> : ISP<T>, ISPRConvertible<T>
 public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
 {
     #region props
-    List<KeyValuePair<short, IDisposable>>? IDSP.Disposables { get; set; }
-    List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables { get; set; }
+    List<KeyValuePair<short, IDisposable>>? _disposables;
+    List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
+    private SPV<T> _value;
+
+    List<KeyValuePair<short, IDisposable>>? IDSP.Disposables => _disposables;
+    List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables => _asyncDisposables;
 
     public SPF Fault { get; set; }
-    SPV<T> ISP<T>.Value { get; set; }
+    SPV<T> ISP<T>.Value => _value;
     #endregion props
 
     #region ctors
     public DSPR()
     {
-    }
 
+    }
     public DSPR(
         SPV<T> value,
         SPF fault,
         List<KeyValuePair<short, IDisposable>>? disposables,
         List<KeyValuePair<short, IAsyncDisposable>>? asyncDisposables)
     {
-        ((ISP<T>)this).Value = value;
+        _value = value;
         Fault = fault;
-        ((IDSP)this).Disposables = disposables;
-        ((IDSP)this).AsyncDisposables = asyncDisposables;
+        _disposables = disposables;
+        _asyncDisposables = asyncDisposables;
     }
     #endregion ctors
 
@@ -174,6 +180,8 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
     #region disposal
     public DSPR<T> MarkDispose(short index = 0)
     {
+        _disposables ??= [];
+        _asyncDisposables ??= [];
         ((IDSP<T, DSPR<T>, SPR<T>>)this).InternalMarkDispose(index);
 
         return this;
@@ -196,8 +204,8 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
     //public static implicit operator N_SPR<T>(in T val) =>
     //    new(val, default);
 
-    public static implicit operator DSPR<T>(in SPF fault) =>
-        new(new SPV<T>(), fault, default, default);
+    //public static implicit operator DSPR<T>(in SPF fault) =>
+    //    new(new SPV<T>(), fault, default, default);
 
 
 #if Release
@@ -212,10 +220,13 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
 public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
 {
     #region props
-    List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions { get; set; }
+    List<KeyValuePair<short, TransactionScope>>? _transactions;
+    private SPV<T> _value;
 
-    SPV<T> ISP<T>.Value { get; set; }
+    List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions => _transactions;
+
     public SPF Fault { get; set; }
+    SPV<T> ISP<T>.Value => _value;
     #endregion props
 
     #region ctors
@@ -227,9 +238,9 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
         SPF fault,
         List<KeyValuePair<short, TransactionScope>>? transactions)
     {
-        ((ISP<T>)this).Value = val;
+        _value = val;
         Fault = fault;
-        ((ITSP<T, TSPR<T>, SPR<T>>)this).Transactions = transactions;
+        _transactions = transactions;
     }
     #endregion ctors
 
@@ -285,6 +296,7 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
     #region transactional
     public TSPR<T> MarkScope(short index = 0)
     {
+        _transactions ??= [];
         ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalMarkScope(index);
 
         return this;
@@ -319,12 +331,17 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRConvertible<SPR<T>>
 public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>, ISPRConvertible<SPR<T>>
 {
     #region props
-    List<KeyValuePair<short, IDisposable>>? IDSP.Disposables { get; set; }
-    List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables { get; set; }
-    List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions { get; set; }
+    List<KeyValuePair<short, TransactionScope>>? _transactions;
+    List<KeyValuePair<short, IDisposable>>? _disposables;
+    List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
+    private SPV<T> _value;
 
-    public SPV<T> Value { get; set; }
+    List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions => _transactions;
+    List<KeyValuePair<short, IDisposable>>? IDSP.Disposables => _disposables;
+    List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables => _asyncDisposables;
+
     public SPF Fault { get; set; }
+    SPV<T> ISP<T>.Value => _value;
     #endregion props
 
     #region ctors
@@ -338,11 +355,11 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
        List<KeyValuePair<short, IDisposable>>? disposables,
        List<KeyValuePair<short, IAsyncDisposable>>? asyncDisposables)
     {
-        ((ISP<T>)this).Value = value;
+        _value = value;
         Fault = fault;
-        ((ITSP)this).Transactions = transactions;
-        ((IDSP)this).Disposables = disposables;
-        ((IDSP)this).AsyncDisposables = asyncDisposables;
+        _transactions = transactions;
+        _disposables = disposables;
+        _asyncDisposables = asyncDisposables;
     }
     #endregion ctors
 
@@ -375,12 +392,12 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
             ((IDSP)this).Disposables,
             ((IDSP)this).AsyncDisposables);
 
-    public bool Succeed() => Value.Completed;
+    public bool Succeed() => ((ISP<T>)this).Value.Completed;
     public bool Succeed(out T result)
     {
-        if (Value.Completed)
+        if (((ISP<T>)this).Value.Completed)
         {
-            result = Value.Payload;
+            result = ((ISP<T>)this).Value.Payload;
             return true;
         }
 
@@ -388,10 +405,10 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
         return false;
     }
 
-    public bool Faulted() => !Value.Completed;
+    public bool Faulted() => !((ISP<T>)this).Value.Completed;
     public bool Faulted(out SPF fault)
     {
-        if (!Value.Completed)
+        if (!((ISP<T>)this).Value.Completed)
         {
             fault = Fault;
             return true;
@@ -405,6 +422,8 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
     #region disposal
     public TDSPR<T> MarkDispose(short index = 0)
     {
+        _disposables ??= [];
+        _asyncDisposables ??= [];
         ((IDSP<T, TDSPR<T>>)this).InternalMarkDispose(index);
 
         return this;
@@ -420,7 +439,7 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
         ((IDSP<T, TDSPR<T>, TSPR<T>>)this).InternalDisposeAll();
 
         return new TSPR<T>(
-            Value,
+            ((ISP<T>)this).Value,
             Fault,
             ((ITSP<T, TDSPR<T>, DSPR<T>>)this).Transactions);
     }
@@ -429,6 +448,7 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
     #region transactional
     public TDSPR<T> MarkScope(short index = 0)
     {
+        _transactions ??= [];
         ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalMarkScope(index);
 
         return this;
@@ -450,7 +470,7 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
         ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalCompleteAllScopes();
 
         return new DSPR<T>(
-            Value,
+            ((ISP<T>)this).Value,
             Fault,
             ((IDSP<T, TDSPR<T>, TSPR<T>>)this).Disposables,
             ((IDSP<T, TDSPR<T>, TSPR<T>>)this).AsyncDisposables);
@@ -460,7 +480,7 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
         ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalDisposeAllScopes();
 
         return new DSPR<T>(
-            Value,
+            ((ISP<T>)this).Value,
             Fault,
             ((IDSP<T, TDSPR<T>, TSPR<T>>)this).Disposables,
             ((IDSP<T, TDSPR<T>, TSPR<T>>)this).AsyncDisposables);
@@ -523,8 +543,11 @@ public struct VSP : ISP
 public struct DVSP : IDSP, ISPRConvertible<VSP>
 {
     #region props
-    List<KeyValuePair<short, IDisposable>>? IDSP.Disposables { get; set; }
-    List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables { get; set; }
+    List<KeyValuePair<short, IDisposable>>? _disposables;
+    List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
+
+    List<KeyValuePair<short, IDisposable>>? IDSP.Disposables => _disposables;
+    List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables => _asyncDisposables;
 
     public SPF Fault { get; set; }
     internal bool Success { get; set; }
@@ -551,8 +574,8 @@ public struct DVSP : IDSP, ISPRConvertible<VSP>
     {
         Success = success;
         Fault = fault;
-        ((IDSP)this).Disposables = disposables;
-        ((IDSP)this).AsyncDisposables = asyncDisposables;
+        _disposables = disposables;
+        _asyncDisposables = asyncDisposables;
     }
     #endregion ctors
 
@@ -602,7 +625,9 @@ public struct DVSP : IDSP, ISPRConvertible<VSP>
 public struct TVSP : ITSP, ISPRConvertible<VSP>
 {
     #region props
-    List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions { get; set; }
+    List<KeyValuePair<short, TransactionScope>>? _transactions;
+
+    List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions => _transactions;
 
     internal bool Success { get; set; }
     public SPF Fault { get; set; }
@@ -626,7 +651,7 @@ public struct TVSP : ITSP, ISPRConvertible<VSP>
     {
         Success = success;
         Fault = fault;
-        ((ITSP)this).Transactions = transactions;
+        _transactions = transactions;
     }
     #endregion ctors
 
@@ -687,9 +712,13 @@ public struct TVSP : ITSP, ISPRConvertible<VSP>
 public struct TDVSP : ITSP, IDSP, ISPRConvertible<VSP>
 {
     #region props
-    List<KeyValuePair<short, IDisposable>>? IDSP.Disposables { get; set; }
-    List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables { get; set; }
-    List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions { get; set; }
+    List<KeyValuePair<short, TransactionScope>>? _transactions;
+    List<KeyValuePair<short, IDisposable>>? _disposables;
+    List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
+
+    List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions => _transactions;
+    List<KeyValuePair<short, IDisposable>>? IDSP.Disposables => _disposables;
+    List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables => _asyncDisposables;
 
     internal bool Success { get; set; }
     public SPF Fault { get; set; }
@@ -713,9 +742,9 @@ public struct TDVSP : ITSP, IDSP, ISPRConvertible<VSP>
     {
         Success = success;
         Fault = fault;
-        ((ITSP)this).Transactions = transactions;
-        ((IDSP)this).Disposables = disposables;
-        ((IDSP)this).AsyncDisposables = asyncDisposables;
+        _transactions = transactions;
+        _disposables = disposables;
+        _asyncDisposables = asyncDisposables;
     }
     #endregion ctors
 
