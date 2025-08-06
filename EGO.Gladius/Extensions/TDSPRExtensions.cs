@@ -772,3 +772,75 @@ public static class TDSPR_From_Task_See
         }
     }
 }
+
+public static class TDSPR_Fault_Handlers
+{
+    public static TDSPR<T> HandleFault<T>(this TDSPR<T> spr, Func<TDSPR<T>, SPR<T>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr;
+
+            return spr.Pass<T>(del(spr));
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<T>> HandleFault<T>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask<SPR<T>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr;
+
+            return spr.Pass<T>(await del(spr));
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+        }
+    }
+}
+
+public static class TDSPR_Null_Handlers
+{
+    public static TDSPR<T> HandleNull<T>(this TDSPR<T> spr, Func<TDSPR<T>, SPR<T>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr;
+
+            if (spr.HasValue())
+                return spr;
+
+            return spr.Pass<T>(del(spr));
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+        }
+    }
+
+    public static async ValueTask<TDSPR<T>> HandleNull<T>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask<SPR<T>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr;
+
+            if (spr.HasValue())
+                return spr;
+
+            return spr.Pass<T>(await del(spr));
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+        }
+    }
+}

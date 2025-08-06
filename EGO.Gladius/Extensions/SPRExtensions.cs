@@ -769,10 +769,73 @@ public static class SPR_From_Task_See
     }
 }
 
-public static class SPR_Handlers
+public static class SPR_Fault_Handlers
 {
-    public static SPR<T> HandleFault<T>(this SPR<T> spr, )
+    public static SPR<T> HandleFault<T>(this SPR<T> spr, Func<SPR<T>, SPR<T>> del)
     {
+        try
+        {
+            if (spr.Succeed())
+                return spr;
 
+            return del(spr);
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
+        }
+    }
+
+    public static async ValueTask<SPR<T>> HandleFault<T>(this SPR<T> spr, Func<SPR<T>, ValueTask<SPR<T>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr;
+
+            return await del(spr);
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
+        }
+    }
+}
+public static class SPR_Null_Handlers
+{
+    public static SPR<T> HandleNull<T>(this SPR<T> spr, Func<SPR<T>, SPR<T>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr;
+
+            if (spr.HasValue())
+                return spr;
+
+            return del(spr);
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
+        }
+    }
+
+    public static async ValueTask<SPR<T>> HandleNull<T>(this SPR<T> spr, Func<SPR<T>, ValueTask<SPR<T>>> del)
+    {
+        try
+        {
+            if (spr.Succeed())
+                return spr;
+
+            if (spr.HasValue())
+                return spr;
+
+            return await del(spr);
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(del.Method, [spr.Value.Payload], e);
+        }
     }
 }
