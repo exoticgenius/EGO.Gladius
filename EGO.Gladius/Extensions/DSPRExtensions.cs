@@ -844,3 +844,32 @@ public static class DSPR_Null_Handlers
         }
     }
 }
+
+public static class DSPR_To_Void
+{
+    public static async ValueTask<DVSP> Void<T>(this ValueTask<DSPR<T>> taskSpr)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            return spr.Void();
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<T>(SPF.Gen(e)).Void();
+        }
+    }
+
+    public static async ValueTask<DVSP> Void<T>(this Task<DSPR<T>> taskSpr)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            return spr.Void();
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<T>(SPF.Gen(e)).Void();
+        }
+    }
+}

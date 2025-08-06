@@ -844,3 +844,32 @@ public static class TSPR_Null_Handlers
         }
     }
 }
+
+public static class TSPR_To_Void
+{
+    public static async ValueTask<TVSP> Void<T>(this ValueTask<TSPR<T>> taskSpr)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            return spr.Void();
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<T>(SPF.Gen(e)).Void();
+        }
+    }
+
+    public static async ValueTask<TVSP> Void<T>(this Task<TSPR<T>> taskSpr)
+    {
+        var spr = await taskSpr;
+        try
+        {
+            return spr.Void();
+        }
+        catch (Exception e)
+        {
+            return spr.Pass<T>(SPF.Gen(e)).Void();
+        }
+    }
+}

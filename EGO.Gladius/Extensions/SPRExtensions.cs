@@ -839,3 +839,32 @@ public static class SPR_Null_Handlers
         }
     }
 }
+
+public static class SPR_To_Void
+{
+    public static async ValueTask<VSP> Void<T>(this ValueTask<SPR<T>> taskSpr)
+    {
+        try
+        {
+            var spr = await taskSpr;
+            return spr.Void();
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(e);
+        }
+    }
+
+    public static async ValueTask<VSP> Void<T>(this Task<SPR<T>> taskSpr)
+    {
+        try
+        {
+            var spr = await taskSpr;
+            return spr.Void();
+        }
+        catch (Exception e)
+        {
+            return SPF.Gen(e);
+        }
+    }
+}
