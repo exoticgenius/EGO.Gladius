@@ -51,25 +51,35 @@ public struct TVSP : ITSP, ISPRDescendable<VSP>
     #region transactional
     public TVSP CompleteScope(short index = -1)
     {
-        ((ITSP)this).InternalCompleteScope(index);
+        foreach (var item in ((ITSP)this).Transactions ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+            {
+                if (Succeed())
+                    c.Complete();
+                c.Dispose();
+            }
 
         return this;
     }
     public TVSP DisposeScope(short index = -1)
     {
-        ((ITSP)this).InternalDisposeScope(index);
+        foreach (var item in _transactions ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                c.Dispose();
 
         return this;
     }
     public VSP CompleteAllScopes()
     {
-        ((ITSP)this).InternalCompleteAllScopes();
+        foreach (var item in _transactions ?? [])
+            CompleteScope(item.Key);
 
         return new VSP(Success, Fault);
     }
     public VSP DisposeAllScopes()
     {
-        ((ITSP)this).InternalDisposeAllScopes();
+        foreach (var item in _transactions ?? [])
+            DisposeScope(item.Key);
 
         return new VSP(Success, Fault);
     }

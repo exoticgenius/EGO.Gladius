@@ -93,32 +93,42 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     #region transactional
     public TSPR<T> MarkScope(short index = 0)
     {
-        _transactions ??= [];
-        ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalMarkScope(index);
+        if (Value.Completed && Value.Payload is TransactionScope tr)
+            (_transactions??= []).Add(new(index, tr));
 
         return this;
     }
     public TSPR<T> CompleteScope(short index = -1)
     {
-        ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalCompleteScope(index);
+        foreach (var item in ((ITSP)this).Transactions ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+            {
+                if (Succeed())
+                    c.Complete();
+                c.Dispose();
+            }
 
         return this;
     }
     public TSPR<T> DisposeScope(short index = -1)
     {
-        ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalDisposeScope(index);
+        foreach (var item in _transactions ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                c.Dispose();
 
         return this;
     }
     public SPR<T> CompleteAllScopes()
     {
-        ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalCompleteAllScopes();
+        foreach (var item in _transactions ?? [])
+            CompleteScope(item.Key);
 
         return new SPR<T>(Value, Fault);
     }
     public SPR<T> DisposeAllScopes()
     {
-        ((ITSP<T, TSPR<T>, SPR<T>>)this).InternalDisposeAllScopes();
+        foreach (var item in _transactions ?? [])
+            DisposeScope(item.Key);
 
         return new SPR<T>(Value, Fault);
     }

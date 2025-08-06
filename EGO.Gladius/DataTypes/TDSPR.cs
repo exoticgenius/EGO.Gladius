@@ -1,5 +1,6 @@
 ﻿using EGO.Gladius.Contracts;
 
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Transactions;
@@ -110,21 +111,29 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
     #region disposal
     public TDSPR<T> MarkDispose(short index = 0)
     {
-        _disposables ??= [];
-        _asyncDisposables ??= [];
-        ((IDSP<T, TDSPR<T>>)this).InternalMarkDispose(index);
+        if (!Value.Completed)
+            return this;
+
+        if (Value.Payload is IDisposable dis)
+            (_disposables ??= []).Add(new(index, dis));
+
+        else if (Value.Payload is IAsyncDisposable adis)
+            (_asyncDisposables ??= []).Add(new(index, adis));
 
         return this;
     }
     public TDSPR<T> Dispose(short index = -1)
     {
-        ((IDSP<T, TDSPR<T>, TSPR<T>>)this).InternalDispose(index);
+        foreach (var item in _disposables ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                c.Dispose();
 
         return this;
     }
     public TSPR<T> DisposeAll()
     {
-        ((IDSP<T, TDSPR<T>, TSPR<T>>)this).InternalDisposeAll();
+        foreach (var item in _disposables ?? [])
+            item.Value?.Dispose();
 
         return new TSPR<T>(
             Value,
@@ -136,26 +145,35 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
     #region transactional
     public TDSPR<T> MarkScope(short index = 0)
     {
-        _transactions ??= [];
-        ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalMarkScope(index);
+        if (Value.Completed && Value.Payload is TransactionScope tr)
+            (_transactions ??= []).Add(new(index, tr));
 
         return this;
     }
     public TDSPR<T> CompleteScope(short index = -1)
     {
-        ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalCompleteScope(index);
+        foreach (var item in ((ITSP)this).Transactions ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+            {
+                if (Succeed())
+                    c.Complete();
+                c.Dispose();
+            }
 
         return this;
     }
     public TDSPR<T> DisposeScope(short index = -1)
     {
-        ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalDisposeScope(index);
+        foreach (var item in _transactions ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                c.Dispose();
 
         return this;
     }
     public DSPR<T> CompleteAllScopes()
     {
-        ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalCompleteAllScopes();
+        foreach (var item in _transactions ?? [])
+            CompleteScope(item.Key);
 
         return new DSPR<T>(
             Value,
@@ -165,7 +183,8 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
     }
     public DSPR<T> DisposeAllScopes()
     {
-        ((ITSP<T, TDSPR<T>, DSPR<T>>)this).InternalDisposeAllScopes();
+        foreach (var item in _transactions ?? [])
+            DisposeScope(item.Key);
 
         return new DSPR<T>(
             Value,

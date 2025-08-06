@@ -58,13 +58,16 @@ public struct TDVSP : ITSP, IDSP, ISPRDescendable<VSP>
     #region disposal
     public TDVSP Dispose(short index = -1)
     {
-        ((IDSP)this).InternalDispose(index);
+        foreach (var item in _disposables ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                c.Dispose();
 
         return this;
     }
     public TVSP DisposeAll()
     {
-        ((IDSP)this).InternalDisposeAll();
+        foreach (var item in _disposables ?? [])
+            item.Value?.Dispose();
 
         return new TVSP(
             Success,
@@ -76,19 +79,28 @@ public struct TDVSP : ITSP, IDSP, ISPRDescendable<VSP>
     #region transactional
     public TDVSP CompleteScope(short index = -1)
     {
-        ((ITSP)this).InternalCompleteScope(index);
+        foreach (var item in ((ITSP)this).Transactions ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+            {
+                if (Succeed())
+                    c.Complete();
+                c.Dispose();
+            }
 
         return this;
     }
     public TDVSP DisposeScope(short index = -1)
     {
-        ((ITSP)this).InternalDisposeScope(index);
+        foreach (var item in _transactions ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                c.Dispose();
 
         return this;
     }
     public DVSP CompleteAllScopes()
     {
-        ((ITSP)this).InternalCompleteAllScopes();
+        foreach (var item in _transactions ?? [])
+            CompleteScope(item.Key);
 
         return new DVSP(
             Success,
@@ -98,7 +110,8 @@ public struct TDVSP : ITSP, IDSP, ISPRDescendable<VSP>
     }
     public DVSP DisposeAllScopes()
     {
-        ((ITSP)this).InternalDisposeAllScopes();
+        foreach (var item in _transactions ?? [])
+            DisposeScope(item.Key);
 
         return new DVSP(
             Success,

@@ -1,5 +1,6 @@
 ﻿using EGO.Gladius.Contracts;
 
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -101,22 +102,30 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     #region disposal
     public DSPR<T> MarkDispose(short index = 0)
     {
-        _disposables ??= [];
-        _asyncDisposables ??= [];
-        ((IDSP<T, DSPR<T>, SPR<T>>)this).InternalMarkDispose(index);
+        if (!Value.Completed)
+            return this;
+
+        if (Value.Payload is IDisposable dis)
+            (_disposables ??= []).Add(new(index, dis));
+
+        else if (Value.Payload is IAsyncDisposable adis)
+            (_asyncDisposables ??= []).Add(new(index, adis));
 
         return this;
     }
     public DSPR<T> Dispose(short index = -1)
     {
-        ((IDSP<T, DSPR<T>, SPR<T>>)this).InternalDispose(index);
+        foreach (var item in _disposables ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                c.Dispose();
 
         return this;
     }
     public SPR<T> DisposeAll()
     {
-        ((IDSP<T, DSPR<T>, SPR<T>>)this).InternalDisposeAll();
-
+        foreach (var item in _disposables ?? [])
+            item.Value?.Dispose();
+     
         return new SPR<T>(Value, Fault);
     }
     #endregion disposal

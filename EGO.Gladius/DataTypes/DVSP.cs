@@ -56,13 +56,16 @@ public struct DVSP : IDSP, ISPRDescendable<VSP>
     #region disposal
     public DVSP Dispose(short index = -1)
     {
-        ((IDSP)this).InternalDispose(index);
+        foreach (var item in _disposables ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                c.Dispose();
 
         return this;
     }
     public VSP DisposeAll()
     {
-        ((IDSP)this).InternalDispose();
+        foreach (var item in _disposables ?? [])
+            item.Value?.Dispose();
 
         return new VSP(Success, Fault);
     }

@@ -40,11 +40,11 @@ public struct O_VSP
         return false;
     }
 
-    public void ThrowIfFaulted()
-    {
-        if (!Success)
-            Fault.Throw();
-    }
+    //public void ThrowIfFaulted()
+    //{
+    //    if (!Success)
+    //        Fault.Throw();
+    //}
 
     #region transform
 

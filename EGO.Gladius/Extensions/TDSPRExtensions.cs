@@ -845,7 +845,7 @@ public static class TDSPR_Null_Handlers
     }
 }
 
-public static class DSPR_To_Void
+public static class TDSPR_To_Void
 {
     public static async ValueTask<TDVSP> Void<T>(this ValueTask<TDSPR<T>> taskSpr)
     {

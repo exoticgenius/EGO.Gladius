@@ -9,3 +9,12 @@ public class SPFE : Exception
         Fault = fault;
     }
 }
+public class SPFST : Exception
+{
+    private string _stackTrace = string.Empty;
+    public override string? StackTrace { get => _stackTrace; }
+    public SPFST(string stackTrace)
+    {
+        _stackTrace = stackTrace;
+    }
+}
