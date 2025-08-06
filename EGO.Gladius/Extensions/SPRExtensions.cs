@@ -768,3 +768,11 @@ public static class SPR_From_Task_See
         }
     }
 }
+
+public static class SPR_Handlers
+{
+    public static SPR<T> HandleFault<T>(this SPR<T> spr, )
+    {
+
+    }
+}
