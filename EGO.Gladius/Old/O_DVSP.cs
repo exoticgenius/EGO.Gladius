@@ -1,5 +1,4 @@
-﻿using EGO.Gladius.Contracts;
-using EGO.Gladius.DataTypes;
+﻿using EGO.Gladius.DataTypes;
 
 using System.Transactions;
 
@@ -49,7 +48,7 @@ public struct O_DVSP
 
     public O_DVSP Dispose(int index = -1)
     {
-        foreach (var item in Disposables ?? [])
+        foreach (KeyValuePair<int, IDisposable> item in Disposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 
@@ -61,7 +60,7 @@ public struct O_DVSP
 
     public async ValueTask<O_DVSP> DisposeAsync(int index = -1)
     {
-        foreach (var item in AsyncDisposables ?? [])
+        foreach (KeyValuePair<int, IAsyncDisposable> item in AsyncDisposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 await c.DisposeAsync();
 
@@ -70,7 +69,7 @@ public struct O_DVSP
 
     public O_DVSP DisposeAll()
     {
-        foreach (var item in Disposables ?? [])
+        foreach (KeyValuePair<int, IDisposable> item in Disposables ?? [])
             item.Value?.Dispose();
 
         return Completed;
@@ -78,7 +77,7 @@ public struct O_DVSP
 
     public async ValueTask<O_DVSP> DisposeAllAsync()
     {
-        foreach (var item in AsyncDisposables ?? [])
+        foreach (KeyValuePair<int, IAsyncDisposable> item in AsyncDisposables ?? [])
             if (item.Value is { } c)
                 await c.DisposeAsync();
 
@@ -112,7 +111,7 @@ public struct O_DVSP
 
     public O_DVSP CompleteScope(int index = -1)
     {
-        foreach (var item in Transactions ?? [])
+        foreach (KeyValuePair<int, TransactionScope> item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
             {
                 c.Complete();
@@ -126,7 +125,7 @@ public struct O_DVSP
 
     public O_DVSP DisposeScope(int index = -1)
     {
-        foreach (var item in Transactions ?? [])
+        foreach (KeyValuePair<int, TransactionScope> item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 

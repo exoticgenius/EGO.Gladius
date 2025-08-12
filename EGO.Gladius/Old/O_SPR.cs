@@ -1,5 +1,4 @@
-﻿using EGO.Gladius.Contracts;
-using EGO.Gladius.DataTypes;
+﻿using EGO.Gladius.DataTypes;
 
 using System.ComponentModel;
 using System.Diagnostics;
@@ -7,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace EGO.Gladius.Old;
 
-public struct O_SPR 
+public struct O_SPR
 {
     public static readonly O_SPR Completed = new();
 
@@ -109,7 +108,7 @@ public struct O_SPR
         while (tryFor != 0)
         {
             --tryFor;
-            var res = await source();
+            O_SPR<T> res = await source();
 
             if (res.Succeed())
                 return res;
@@ -126,7 +125,7 @@ public struct O_SPR
 
         while (!ct.IsCancellationRequested)
         {
-            var res = await source();
+            O_SPR<T> res = await source();
 
             if (res.Succeed())
                 return res;
@@ -140,11 +139,11 @@ public struct O_SPR
     public static async Task<O_SPR<T>> InsistAsync<T>([NotNull] Func<Task<O_SPR<T>>> source, TimeSpan timeout)
     {
         O_SPF? lastSPF = null;
-        var sw = Stopwatch.StartNew();
+        Stopwatch sw = Stopwatch.StartNew();
 
         while (sw.Elapsed < timeout)
         {
-            var res = await source();
+            O_SPR<T> res = await source();
 
             if (res.Succeed())
                 return res;
@@ -396,7 +395,7 @@ public struct O_SPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 del(res);
             else
                 del(default);
@@ -413,7 +412,7 @@ public struct O_SPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 await del(res);
             else
                 await del(default);
@@ -430,7 +429,7 @@ public struct O_SPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 await del(res);
             else
                 await del(default);
@@ -573,7 +572,7 @@ public struct O_SPR<T>
 
     public object? ExtractPayload()
     {
-        if (Succeed(out var result))
+        if (Succeed(out T? result))
             return result;
 
         return Fault;

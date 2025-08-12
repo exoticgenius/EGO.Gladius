@@ -2,5 +2,5 @@
 
 public interface ISPRVoidable<To>
 {
-    public To Void();
+    To Void();
 }

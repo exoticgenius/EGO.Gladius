@@ -83,12 +83,12 @@ public struct O_SPF
 
     private static string GenerateStackTrace()
     {
-        var frames = new StackTrace(WithFile).GetFrames();
-        var sb = new StringBuilder();
+        StackFrame[] frames = new StackTrace(WithFile).GetFrames();
+        StringBuilder sb = new();
 
-        foreach (var frame in frames)
+        foreach (StackFrame frame in frames)
         {
-            var source = frame.GetFileName();
+            string? source = frame.GetFileName();
 
             if (source is null) continue;
 

@@ -4,17 +4,17 @@ namespace EGO.Gladius.Contracts;
 
 public interface ISP
 {
-    public SPF Fault { get; }
+    SPF Fault { get; }
 
-    public bool Faulted();
-    public bool Succeed();
+    bool Faulted();
+    bool Succeed();
 }
 
 public interface ISP<T> : ISP
 {
-    public bool Succeed(out T result);
+    bool Succeed(out T result);
 
-    public bool Faulted(out SPF fault);
+    bool Faulted(out SPF fault);
 
-    public bool HasValue();
+    bool HasValue();
 }

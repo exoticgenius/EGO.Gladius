@@ -1,6 +1,4 @@
-﻿using EGO.Gladius.Contracts;
-
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Transactions;
 
 namespace EGO.Gladius.Old;
@@ -18,7 +16,7 @@ public struct O_TSPR<T>
 
     public O_TSPR<T> MarkScope(int index = 0)
     {
-        if (!SPR.Succeed(out var res))
+        if (!SPR.Succeed(out T? res))
             return this;
 
         if (res is TransactionScope tr)
@@ -35,7 +33,7 @@ public struct O_TSPR<T>
 
     public O_TSPR<T> CompleteScope(int index = -1)
     {
-        foreach (var item in Transactions ?? [])
+        foreach (KeyValuePair<int, TransactionScope> item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
             {
                 //if (Succeed())
@@ -50,7 +48,7 @@ public struct O_TSPR<T>
 
     public O_TSPR<T> DisposeScope(int index = -1)
     {
-        foreach (var item in Transactions ?? [])
+        foreach (KeyValuePair<int, TransactionScope> item in Transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 
@@ -143,7 +141,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 del(res);
             else
                 del(default);
@@ -160,7 +158,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 await del(res);
             else
                 await del(default);
@@ -177,7 +175,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 await del(res);
             else
                 await del(default);
@@ -240,7 +238,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 return Pass(del(res));
 
             return Fault<R>();
@@ -255,7 +253,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 return Pass(del(res));
 
             return Fault<R>();
@@ -270,7 +268,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 return Pass(del(res));
 
             return Fault<R>();
@@ -285,7 +283,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 return Pass(await del(res));
 
             return Fault<R>();
@@ -300,7 +298,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 return Pass(await del(res));
 
             return Fault<R>();
@@ -315,7 +313,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 return Pass(await del(res));
 
             return Fault<R>();
@@ -330,7 +328,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 return Pass(await del(res));
 
             return Fault<R>();
@@ -345,7 +343,7 @@ public struct O_DSPR<T>
     {
         try
         {
-            if (Succeed(out var res))
+            if (Succeed(out T? res))
                 return Pass(await del(res));
 
             return Fault<R>();
@@ -363,7 +361,7 @@ public struct O_DSPR<T>
 
     public O_DSPR<T> MarkDispose(int index = 0)
     {
-        if (!SPR.Succeed(out var res))
+        if (!SPR.Succeed(out T? res))
             return this;
 
         if (res is IAsyncDisposable adis)
@@ -383,7 +381,7 @@ public struct O_DSPR<T>
 
     public O_DSPR<T> Dispose(int index = -1)
     {
-        foreach (var item in Disposables ?? [])
+        foreach (KeyValuePair<int, IDisposable> item in Disposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 
@@ -396,7 +394,7 @@ public struct O_DSPR<T>
 
     public async ValueTask<O_DSPR<T>> DisposeAsync(int index = -1)
     {
-        foreach (var item in AsyncDisposables ?? [])
+        foreach (KeyValuePair<int, IAsyncDisposable> item in AsyncDisposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 await c.DisposeAsync();
 
@@ -405,7 +403,7 @@ public struct O_DSPR<T>
 
     public O_SPR<T> DisposeAll()
     {
-        foreach (var item in Disposables ?? [])
+        foreach (KeyValuePair<int, IDisposable> item in Disposables ?? [])
             item.Value?.Dispose();
 
         return SPR;
@@ -413,7 +411,7 @@ public struct O_DSPR<T>
 
     public async ValueTask<O_SPR<T>> DisposeAllAsync()
     {
-        foreach (var item in AsyncDisposables ?? [])
+        foreach (KeyValuePair<int, IAsyncDisposable> item in AsyncDisposables ?? [])
             if (item.Value is { } c)
                 await c.DisposeAsync();
 
@@ -421,7 +419,7 @@ public struct O_DSPR<T>
     }
 
     public O_DSPR<T> Pass(O_SPR<T> spr) => throw new Exception();
-   //new (spr, Disposables, AsyncDisposables, Transactions);
+    //new (spr, Disposables, AsyncDisposables, Transactions);
 
     public O_DSPR<R> Pass<R>(O_SPR<R> spr) => throw new Exception();
     //new (spr, Disposables, AsyncDisposables, Transactions);
@@ -430,7 +428,7 @@ public struct O_DSPR<T>
     //new (val, Disposables, AsyncDisposables, Transactions);
 
     public O_DSPR<R> Pass<R>(R val) => throw new Exception();
-//        new(val, Disposables, AsyncDisposables, Transactions);
+    //        new(val, Disposables, AsyncDisposables, Transactions);
 
     public bool Faulted() =>
         SPR.Faulted();
@@ -451,7 +449,7 @@ public struct O_DSPR<T>
         SPR.HasValue();
 
     public O_DSPR<T> Fault() => throw new Exception();
-   // new (new(SPR.Fault), Disposables, AsyncDisposables, Transactions);
+    // new (new(SPR.Fault), Disposables, AsyncDisposables, Transactions);
 
     public O_DSPR<T> Fault(O_SPF fault) => throw new Exception();
     //new (new(fault), Disposables, AsyncDisposables, Transactions);
@@ -466,6 +464,6 @@ public struct O_DSPR<T>
     //new (SPR.Fault, Disposables, AsyncDisposables, Transactions);
 
     public O_DVSP ToDVSP(O_SPF fault) => throw new Exception();
-   // new (fault, Disposables, AsyncDisposables, Transactions);throw new Exception();
+    // new (fault, Disposables, AsyncDisposables, Transactions);throw new Exception();
 
 }

@@ -1,6 +1,5 @@
 ﻿using EGO.Gladius.Contracts;
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Transactions;
@@ -8,12 +7,12 @@ using System.Transactions;
 namespace EGO.Gladius.DataTypes;
 
 [DebuggerDisplay("{DebuggerPreview}")]
-public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>, ISPRDescendable<SPR<T>>, ISPRVoidable<TDVSP>
+public struct TDSPR<T> : ITSP<TDSPR<T>, DSPR<T>, T>, IDSP<TDSPR<T>, TSPR<T>, T>, ISPRDescendable<SPR<T>>, ISPRVoidable<TDVSP>
 {
     #region props
-    List<KeyValuePair<short, TransactionScope>>? _transactions;
-    List<KeyValuePair<short, IDisposable>>? _disposables;
-    List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
+    private List<KeyValuePair<short, TransactionScope>>? _transactions;
+    private List<KeyValuePair<short, IDisposable>>? _disposables;
+    private List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
 
     List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions => _transactions;
     List<KeyValuePair<short, IDisposable>>? IDSP.Disposables => _disposables;
@@ -47,37 +46,37 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
         CompleteAllScopes()
         .DisposeAll();
     public TDVSP Void() =>
-        new TDVSP(
+        new(
             Succeed(),
             Fault,
-            ((ITSP)this).Transactions,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _transactions,
+            _disposables,
+            _asyncDisposables);
     public bool HasValue() => Value.HasValue();
 
     public TDSPR<X> Pass<X>(X val) =>
-        new TDSPR<X>(
+        new(
             new SPV<X>(val),
             Fault,
-            ((ITSP)this).Transactions,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _transactions,
+            _disposables,
+            _asyncDisposables);
 
     public TDSPR<X> Pass<X>(SPR<X> spr) =>
-        new TDSPR<X>(
+        new(
             spr.Value,
             spr.Fault,
-            ((ITSP)this).Transactions,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _transactions,
+            _disposables,
+            _asyncDisposables);
 
     public TDSPR<X> Pass<X>(SPF fault) =>
-        new TDSPR<X>(
+        new(
             default,
             fault,
-            ((ITSP)this).Transactions,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _transactions,
+            _disposables,
+            _asyncDisposables);
 
     public bool Succeed() => Value.Completed;
     public bool Faulted() => !Value.Completed;
@@ -122,23 +121,49 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
 
         return this;
     }
+    public TDSPR<T> MarkDispose<E>(E index) where E : Enum =>
+        MarkDispose(Convert.ToInt16(index));
+
     public TDSPR<T> Dispose(short index = -1)
     {
-        foreach (var item in _disposables ?? [])
+        foreach (KeyValuePair<short, IDisposable> item in _disposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 
         return this;
     }
+    public TDSPR<T> Dispose<E>(E index) where E : Enum =>
+        Dispose(Convert.ToInt16(index));
     public TSPR<T> DisposeAll()
     {
-        foreach (var item in _disposables ?? [])
+        foreach (KeyValuePair<short, IDisposable> item in _disposables ?? [])
             item.Value?.Dispose();
 
         return new TSPR<T>(
             Value,
             Fault,
-            ((ITSP<T, TDSPR<T>, DSPR<T>>)this).Transactions);
+            (_transactions);
+    }
+
+    public async ValueTask<TDSPR<T>> DisposeAsync(short index = -1)
+    {
+        foreach (KeyValuePair<short, IAsyncDisposable> item in _asyncDisposables ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                await c.DisposeAsync();
+
+        return this;
+    }
+    public ValueTask<TDSPR<T>> DisposeAsync<E>(E index) where E : Enum =>
+        DisposeAsync(Convert.ToInt16(index));
+    public async ValueTask<TSPR<T>> DisposeAllAsync()
+    {
+        DisposeAll();
+
+        foreach (KeyValuePair<short, IAsyncDisposable> item in _asyncDisposables ?? [])
+            if (item is { })
+                await item.Value.DisposeAsync();
+
+        return new TSPR<T>(Value, Fault, _transactions);
     }
     #endregion disposal
 
@@ -150,9 +175,12 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
 
         return this;
     }
+    public TDSPR<T> MarkScope<E>(E index) where E : Enum =>
+        MarkScope(Convert.ToInt16(index));
+
     public TDSPR<T> CompleteScope(short index = -1)
     {
-        foreach (var item in ((ITSP)this).Transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
             {
                 if (Succeed())
@@ -162,35 +190,41 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
 
         return this;
     }
+    public TDSPR<T> CompleteScope<E>(E index) where E : Enum =>
+        CompleteScope(Convert.ToInt16(index));
+
     public TDSPR<T> DisposeScope(short index = -1)
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 
         return this;
     }
+    public TDSPR<T> DisposeScope<E>(E index) where E : Enum =>
+        DisposeScope(Convert.ToInt16(index));
+
     public DSPR<T> CompleteAllScopes()
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             CompleteScope(item.Key);
 
         return new DSPR<T>(
             Value,
             Fault,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _disposables,
+            _asyncDisposables);
     }
     public DSPR<T> DisposeAllScopes()
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             DisposeScope(item.Key);
 
         return new DSPR<T>(
             Value,
             Fault,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _disposables,
+            _asyncDisposables);
     }
     #endregion transactional
 
@@ -202,7 +236,7 @@ public struct TDSPR<T> : ITSP<T, TDSPR<T>, DSPR<T>>, IDSP<T, TDSPR<T>, TSPR<T>>,
     {
         get
         {
-            if (!((ISP<T>)this).Succeed(out var val))
+            if (!Succeed(out T? val))
                 return Fault.Message ??
                     Fault.Exception?.Message ??
                     "Result Faulted";

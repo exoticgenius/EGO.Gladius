@@ -10,7 +10,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -26,7 +26,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -42,7 +42,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -58,7 +58,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -74,7 +74,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -90,7 +90,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -106,7 +106,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -122,7 +122,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -138,7 +138,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -154,7 +154,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -170,7 +170,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 
@@ -186,7 +186,7 @@ public static class VSPExtensions
     {
         try
         {
-            var taskSPR = await task;
+            O_VSP taskSPR = await task;
             if (!taskSPR.Succeed())
                 return taskSPR.Fault;
 

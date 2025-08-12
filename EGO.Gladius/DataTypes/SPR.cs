@@ -1,6 +1,5 @@
 ﻿using EGO.Gladius.Contracts;
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -11,7 +10,7 @@ namespace EGO.Gladius.DataTypes;
 public struct SPR : ISP
 {
     public readonly static SPR Completed = new();
-    private readonly static SPF _fault = new SPF();
+    private readonly static SPF _fault = new();
 
     public SPF Fault => _fault;
 
@@ -21,7 +20,7 @@ public struct SPR : ISP
 
     public bool Faulted() => false;
 
-    public static SPR<T> Gen<T>(T val) => new SPR<T>(val);
+    public static SPR<T> Gen<T>(T val) => new(val);
 
     public static async ValueTask<VSP> Gen(Task<VSP> val)
     {
@@ -125,7 +124,7 @@ public struct SPR : ISP
         while (tryFor != 0)
         {
             --tryFor;
-            var res = await source();
+            SPR<T> res = await source();
 
             if (res.Succeed())
                 return res;
@@ -142,7 +141,7 @@ public struct SPR : ISP
 
         while (!ct.IsCancellationRequested)
         {
-            var res = await source();
+            SPR<T> res = await source();
 
             if (res.Succeed())
                 return res;
@@ -156,11 +155,11 @@ public struct SPR : ISP
     public static async Task<SPR<T>> TryFor<T>([NotNull] Func<Task<SPR<T>>> source, TimeSpan timeout)
     {
         SPF? lastSPF = null;
-        var sw = Stopwatch.StartNew();
+        Stopwatch sw = Stopwatch.StartNew();
 
         while (sw.Elapsed < timeout)
         {
-            var res = await source();
+            SPR<T> res = await source();
 
             if (res.Succeed())
                 return res;
@@ -237,7 +236,7 @@ public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
         Succeed() ?
         Value.Payload :
         throw Fault.GenSPFE();
-    public VSP Void() => new VSP(Succeed(), Fault);
+    public VSP Void() => new(Succeed(), Fault);
     public bool HasValue() => Value.HasValue();
 
     public bool Succeed() => Value.Completed;
@@ -285,7 +284,7 @@ public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
     {
         get
         {
-            if (!((ISP<T>)this).Succeed(out var val))
+            if (!Succeed(out T? val))
                 return Fault.Message ??
                     Fault.Exception?.Message ??
                     "Result Faulted";

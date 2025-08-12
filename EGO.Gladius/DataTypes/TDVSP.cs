@@ -7,12 +7,12 @@ using System.Transactions;
 namespace EGO.Gladius.DataTypes;
 
 [DebuggerDisplay("{DebuggerPreview}")]
-public struct TDVSP : ITSP, IDSP, ISPRDescendable<VSP>
+public struct TDVSP : ITSP<TDVSP, DVSP>, IDSP<TDVSP, TVSP>, ISPRDescendable<VSP>
 {
     #region props
-    List<KeyValuePair<short, TransactionScope>>? _transactions;
-    List<KeyValuePair<short, IDisposable>>? _disposables;
-    List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
+    private List<KeyValuePair<short, TransactionScope>>? _transactions;
+    private List<KeyValuePair<short, IDisposable>>? _disposables;
+    private List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
 
     List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions => _transactions;
     List<KeyValuePair<short, IDisposable>>? IDSP.Disposables => _disposables;
@@ -58,28 +58,49 @@ public struct TDVSP : ITSP, IDSP, ISPRDescendable<VSP>
     #region disposal
     public TDVSP Dispose(short index = -1)
     {
-        foreach (var item in _disposables ?? [])
+        foreach (KeyValuePair<short, IDisposable> item in _disposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 
         return this;
     }
+    public TDVSP Dispose<E>(E index) where E : Enum =>
+        Dispose(Convert.ToInt16(index));
     public TVSP DisposeAll()
     {
-        foreach (var item in _disposables ?? [])
+        foreach (KeyValuePair<short, IDisposable> item in _disposables ?? [])
             item.Value?.Dispose();
 
-        return new TVSP(
-            Success,
-            Fault,
-            ((ITSP)this).Transactions);
+        return new TVSP(Success, Fault, _transactions);
+    }
+
+
+    public async ValueTask<TDVSP> DisposeAsync(short index = -1)
+    {
+        foreach (KeyValuePair<short, IAsyncDisposable> item in _asyncDisposables ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                await c.DisposeAsync();
+
+        return this;
+    }
+    public ValueTask<TDVSP> DisposeAsync<E>(E index) where E : Enum =>
+        DisposeAsync(Convert.ToInt16(index));
+    public async ValueTask<TVSP> DisposeAllAsync()
+    {
+        DisposeAll();
+
+        foreach (KeyValuePair<short, IAsyncDisposable> item in _asyncDisposables ?? [])
+            if (item is { })
+                await item.Value.DisposeAsync();
+
+        return new TVSP(Success, Fault, _transactions);
     }
     #endregion disposal
 
     #region transactional
     public TDVSP CompleteScope(short index = -1)
     {
-        foreach (var item in ((ITSP)this).Transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
             {
                 if (Succeed())
@@ -89,35 +110,41 @@ public struct TDVSP : ITSP, IDSP, ISPRDescendable<VSP>
 
         return this;
     }
+    public TDVSP CompleteScope<E>(E index) where E : Enum =>
+        CompleteScope(Convert.ToInt16(index));
+
     public TDVSP DisposeScope(short index = -1)
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 
         return this;
     }
+    public TDVSP DisposeScope<E>(E index) where E : Enum =>
+        DisposeScope(Convert.ToInt16(index));
+
     public DVSP CompleteAllScopes()
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             CompleteScope(item.Key);
 
         return new DVSP(
             Success,
             Fault,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _disposables,
+            _asyncDisposables);
     }
     public DVSP DisposeAllScopes()
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             DisposeScope(item.Key);
 
         return new DVSP(
             Success,
             Fault,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _disposables,
+            _asyncDisposables);
     }
     #endregion transactional
 

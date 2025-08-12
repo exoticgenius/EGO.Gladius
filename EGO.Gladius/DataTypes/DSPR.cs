@@ -1,17 +1,16 @@
 ﻿using EGO.Gladius.Contracts;
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 
 namespace EGO.Gladius.DataTypes;
 
 [DebuggerDisplay("{DebuggerPreview}")]
-public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRVoidable<DVSP>
+public struct DSPR<T> : IDSP<DSPR<T>, SPR<T>, T>, ISPRDescendable<SPR<T>>, ISPRVoidable<DVSP>
 {
     #region props
-    List<KeyValuePair<short, IDisposable>>? _disposables;
-    List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
+    private List<KeyValuePair<short, IDisposable>>? _disposables;
+    private List<KeyValuePair<short, IAsyncDisposable>>? _asyncDisposables;
 
     List<KeyValuePair<short, IDisposable>>? IDSP.Disposables => _disposables;
     List<KeyValuePair<short, IAsyncDisposable>>? IDSP.AsyncDisposables => _asyncDisposables;
@@ -42,33 +41,33 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     public SPR<T> Descend() =>
         DisposeAll();
     public DVSP Void() =>
-        new DVSP(
+        new(
             Succeed(),
             Fault,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _disposables,
+            _asyncDisposables);
     public bool HasValue() => Value.HasValue();
 
     public DSPR<X> Pass<X>(X val) =>
-        new DSPR<X>(
+        new(
             new SPV<X>(val),
             Fault,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _disposables,
+            _asyncDisposables);
 
     public DSPR<X> Pass<X>(SPR<X> spr) =>
-        new DSPR<X>(
+        new(
             spr.Value,
             spr.Fault,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _disposables,
+            _asyncDisposables);
 
     public DSPR<X> Pass<X>(SPF fault) =>
-        new DSPR<X>(
+        new(
             default,
             fault,
-            ((IDSP)this).Disposables,
-            ((IDSP)this).AsyncDisposables);
+            _disposables,
+            _asyncDisposables);
 
     public bool Succeed() => Value.Completed;
     public bool Faulted() => !Value.Completed;
@@ -113,19 +112,45 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
 
         return this;
     }
+    public DSPR<T> MarkDispose<E>(E index) where E : Enum =>
+        MarkDispose(Convert.ToInt16(index));
+
     public DSPR<T> Dispose(short index = -1)
     {
-        foreach (var item in _disposables ?? [])
+        foreach (KeyValuePair<short, IDisposable> item in _disposables ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 
         return this;
     }
+    public DSPR<T> Dispose<E>(E index) where E : Enum =>
+        Dispose(Convert.ToInt16(index));
     public SPR<T> DisposeAll()
     {
-        foreach (var item in _disposables ?? [])
+        foreach (KeyValuePair<short, IDisposable> item in _disposables ?? [])
             item.Value?.Dispose();
-     
+
+        return new SPR<T>(Value, Fault);
+    }
+
+    public async ValueTask<DSPR<T>> DisposeAsync(short index = -1)
+    {
+        foreach (KeyValuePair<short, IAsyncDisposable> item in _asyncDisposables ?? [])
+            if ((index == -1 || item.Key == index) && item.Value is { } c)
+                await c.DisposeAsync();
+
+        return this;
+    }
+    public ValueTask<DSPR<T>> DisposeAsync<E>(E index) where E : Enum =>
+        DisposeAsync(Convert.ToInt16(index));
+    public async ValueTask<SPR<T>> DisposeAllAsync()
+    {
+        DisposeAll();
+
+        foreach (KeyValuePair<short, IAsyncDisposable> item in _asyncDisposables ?? [])
+            if (item is { })
+                await item.Value.DisposeAsync();
+
         return new SPR<T>(Value, Fault);
     }
     #endregion disposal
@@ -138,7 +163,7 @@ public struct DSPR<T> : IDSP<T, DSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     {
         get
         {
-            if (!((ISP<T>)this).Succeed(out var val))
+            if (!Succeed(out T? val))
                 return Fault.Message ??
                     Fault.Exception?.Message ??
                     "Result Faulted";

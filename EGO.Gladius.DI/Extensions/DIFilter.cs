@@ -8,12 +8,12 @@ public static class DIFilter
 {
     public static void FilterMonadServices(this IServiceCollection collection)
     {
-        foreach (var service in collection.ToList())
+        foreach (ServiceDescriptor? service in collection.ToList())
         {
             if (service.ImplementationType is null)
                 continue;
 
-            var extended = SP.Extend(service.ImplementationType);
+            Type? extended = SP.Extend(service.ImplementationType);
 
             if (extended is null) continue;
 

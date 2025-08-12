@@ -2,5 +2,5 @@
 
 public interface ISPRDescendable<To>
 {
-    public To Descend();
+    To Descend();
 }

@@ -1,5 +1,4 @@
-﻿using EGO.Gladius.Contracts;
-using EGO.Gladius.Old;
+﻿using EGO.Gladius.Old;
 
 using System.Diagnostics.CodeAnalysis;
 

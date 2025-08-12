@@ -7,10 +7,10 @@ using System.Transactions;
 namespace EGO.Gladius.DataTypes;
 
 [DebuggerDisplay("{DebuggerPreview}")]
-public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRVoidable<TVSP>
+public struct TSPR<T> : ITSP<TSPR<T>, SPR<T>, T>, ISPRDescendable<SPR<T>>, ISPRVoidable<TVSP>
 {
     #region props
-    List<KeyValuePair<short, TransactionScope>>? _transactions;
+    private List<KeyValuePair<short, TransactionScope>>? _transactions;
 
     List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions => _transactions;
 
@@ -37,29 +37,29 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     public SPR<T> Descend() =>
         CompleteAllScopes();
     public TVSP Void() =>
-        new TVSP(
+        new(
             Succeed(),
             Fault,
-            ((ITSP)this).Transactions);
+            _transactions);
     public bool HasValue() => Value.HasValue();
 
     public TSPR<X> Pass<X>(X val) =>
-        new TSPR<X>(
+        new(
             new SPV<X>(val),
             Fault,
-            ((ITSP)this).Transactions);
+            _transactions);
 
     public TSPR<X> Pass<X>(SPR<X> spr) =>
-        new TSPR<X>(
+        new(
             spr.Value,
             spr.Fault,
-            ((ITSP)this).Transactions);
+            _transactions);
 
     public TSPR<X> Pass<X>(SPF fault) =>
-        new TSPR<X>(
+        new(
             default,
             fault,
-            ((ITSP)this).Transactions);
+            _transactions);
 
     public bool Succeed() => Value.Completed;
     public bool Faulted() => !Value.Completed;
@@ -94,13 +94,16 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     public TSPR<T> MarkScope(short index = 0)
     {
         if (Value.Completed && Value.Payload is TransactionScope tr)
-            (_transactions??= []).Add(new(index, tr));
+            (_transactions ??= []).Add(new(index, tr));
 
         return this;
     }
+    public TSPR<T> MarkScope<E>(E index) where E : Enum =>
+        MarkScope(Convert.ToInt16(index));
+
     public TSPR<T> CompleteScope(short index = -1)
     {
-        foreach (var item in ((ITSP)this).Transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
             {
                 if (Succeed())
@@ -110,24 +113,30 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
 
         return this;
     }
+    public TSPR<T> CompleteScope<E>(E index) where E : Enum =>
+        CompleteScope(Convert.ToInt16(index));
+
     public TSPR<T> DisposeScope(short index = -1)
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 
         return this;
     }
+    public TSPR<T> DisposeScope<E>(E index) where E : Enum =>
+        DisposeScope(Convert.ToInt16(index));
+
     public SPR<T> CompleteAllScopes()
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             CompleteScope(item.Key);
 
         return new SPR<T>(Value, Fault);
     }
     public SPR<T> DisposeAllScopes()
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             DisposeScope(item.Key);
 
         return new SPR<T>(Value, Fault);
@@ -142,7 +151,7 @@ public struct TSPR<T> : ITSP<T, TSPR<T>, SPR<T>>, ISPRDescendable<SPR<T>>, ISPRV
     {
         get
         {
-            if (!((ISP<T>)this).Succeed(out var val))
+            if (!Succeed(out T? val))
                 return Fault.Message ??
                     Fault.Exception?.Message ??
                     "Result Faulted";

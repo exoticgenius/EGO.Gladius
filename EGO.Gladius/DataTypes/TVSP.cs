@@ -7,10 +7,10 @@ using System.Transactions;
 namespace EGO.Gladius.DataTypes;
 
 [DebuggerDisplay("{DebuggerPreview}")]
-public struct TVSP : ITSP, ISPRDescendable<VSP>
+public struct TVSP : ITSP<TVSP, VSP>, ISPRDescendable<VSP>
 {
     #region props
-    List<KeyValuePair<short, TransactionScope>>? _transactions;
+    private List<KeyValuePair<short, TransactionScope>>? _transactions;
 
     List<KeyValuePair<short, TransactionScope>>? ITSP.Transactions => _transactions;
 
@@ -51,7 +51,7 @@ public struct TVSP : ITSP, ISPRDescendable<VSP>
     #region transactional
     public TVSP CompleteScope(short index = -1)
     {
-        foreach (var item in ((ITSP)this).Transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
             {
                 if (Succeed())
@@ -61,24 +61,30 @@ public struct TVSP : ITSP, ISPRDescendable<VSP>
 
         return this;
     }
+    public TVSP CompleteScope<E>(E index) where E : Enum =>
+        CompleteScope(Convert.ToInt16(index));
+
     public TVSP DisposeScope(short index = -1)
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             if ((index == -1 || item.Key == index) && item.Value is { } c)
                 c.Dispose();
 
         return this;
     }
+    public TVSP DisposeScope<E>(E index) where E : Enum =>
+        DisposeScope(Convert.ToInt16(index));
+
     public VSP CompleteAllScopes()
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             CompleteScope(item.Key);
 
         return new VSP(Success, Fault);
     }
     public VSP DisposeAllScopes()
     {
-        foreach (var item in _transactions ?? [])
+        foreach (KeyValuePair<short, TransactionScope> item in _transactions ?? [])
             DisposeScope(item.Key);
 
         return new VSP(Success, Fault);

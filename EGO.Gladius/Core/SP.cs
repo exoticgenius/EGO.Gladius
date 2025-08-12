@@ -33,7 +33,7 @@ public static class SP
                     typeof(ISP).IsAssignableFrom(x.ReturnType.GenericTypeArguments[0])))
             return null;
 
-        var module = ModuleBuilders
+        ModuleBuilder module = ModuleBuilders
             .GetOrAdd(
                 target.Assembly,
                 (a) => AssemblyBuilder
@@ -42,21 +42,21 @@ public static class SP
                         AssemblyBuilderAccess.Run)
                     .DefineDynamicModule("RTGM_RTGT_container"));
 
-        var typeName = $"{target.Name}_{Guid.NewGuid().ToString().Replace('-', '_')}_RTGT";
+        string typeName = $"{target.Name}_{Guid.NewGuid().ToString().Replace('-', '_')}_RTGT";
 
-        if (TypeMapper.TryGetValue(target, out var type))
+        if (TypeMapper.TryGetValue(target, out Type? type))
             return type;
 
-        var typeBuilder = module.DefineType(
+        TypeBuilder typeBuilder = module.DefineType(
             typeName,
             TypeAttributes.Public,
             target,
             target.GetInterfaces());
 
-        foreach (var item in target.GetConstructors())
+        foreach (ConstructorInfo item in target.GetConstructors())
             GenerateConstructor(typeBuilder, item);
 
-        foreach (var item in target
+        foreach (MethodInfo? item in target
             .GetRuntimeMethods()
             .Where(x =>
                 typeof(ISP).IsAssignableFrom(x.ReturnType) ||
@@ -65,19 +65,19 @@ public static class SP
                     typeof(ISP).IsAssignableFrom(x.ReturnType.GenericTypeArguments[0])))
             GenerateMethod(item, typeBuilder);
 
-        var ct = TypeMapper[target] = typeBuilder.CreateType()!;
+        Type ct = TypeMapper[target] = typeBuilder.CreateType()!;
 
         return ct;
     }
 
     private static void GenerateConstructor(TypeBuilder type, ConstructorInfo item)
     {
-        var prms = new List<Type>();
+        List<Type> prms = new();
         prms.AddRange(item.GetParameters().Select(x => x.ParameterType).ToArray());
-        var ctor = type.DefineConstructor(item.Attributes, item.CallingConvention, prms.ToArray());
-        var il = ctor.GetILGenerator();
+        ConstructorBuilder ctor = type.DefineConstructor(item.Attributes, item.CallingConvention, prms.ToArray());
+        ILGenerator il = ctor.GetILGenerator();
 
-        for (var i = 0; i < prms.Count + 1; i++)
+        for (int i = 0; i < prms.Count + 1; i++)
             il.Emit(OpCodes.Ldarg, i);
 
         il.Emit(OpCodes.Call, item);
@@ -86,24 +86,24 @@ public static class SP
 
     private static void GenerateMethod(MethodInfo methodinfo, TypeBuilder type)
     {
-        var prms = new List<Type>();
+        List<Type> prms = new();
         prms.AddRange(methodinfo.GetParameters().Select(x => x.ParameterType).ToArray());
-        var returnType = methodinfo.ReturnType;
-        var method = type.DefineMethod(
+        Type returnType = methodinfo.ReturnType;
+        MethodBuilder method = type.DefineMethod(
             methodinfo.Name,
             MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.Virtual | MethodAttributes.NewSlot,
             CallingConventions.Standard | CallingConventions.HasThis,
             methodinfo.ReturnType,
             methodinfo.GetParameters().Select(x => x.ParameterType).ToArray());
-        var il = method.GetILGenerator();
+        ILGenerator il = method.GetILGenerator();
 
-        var exBlock = il.BeginExceptionBlock();
-        var end = il.DefineLabel();
+        Label exBlock = il.BeginExceptionBlock();
+        Label end = il.DefineLabel();
         il.DeclareLocal(methodinfo.ReturnType); //      0
         il.DeclareLocal(typeof(Type)); //               1
         il.DeclareLocal(typeof(Exception)); //          2
 
-        for (var i = 0; i < prms.Count + 1; i++)
+        for (int i = 0; i < prms.Count + 1; i++)
             il.Emit(OpCodes.Ldarg, i);
         il.Emit(OpCodes.Call, methodinfo);
 
@@ -114,7 +114,7 @@ public static class SP
             if (genArg[0].GenericTypeArguments.Length > 0)
                 genArg = genArg[0].GenericTypeArguments;
 
-            var suppressor = "SuppressTask";
+            string suppressor = "SuppressTask";
             if (typeof(O_VSP).IsAssignableFrom(genArg[0]))
                 suppressor = "SuppressTaskVoid";
 
@@ -127,7 +127,7 @@ public static class SP
             if (genArg[0].GenericTypeArguments.Length > 0)
                 genArg = genArg[0].GenericTypeArguments;
 
-            var suppressor = "SuppressValueTask";
+            string suppressor = "SuppressValueTask";
             if (typeof(O_VSP).IsAssignableFrom(genArg[0]))
                 suppressor = "SuppressValueTaskVoid";
 
@@ -145,7 +145,7 @@ public static class SP
         il.Emit(OpCodes.Ldc_I4, prms.Count);
         il.Emit(OpCodes.Newarr, typeof(object)); // => 1
 
-        for (var i = 0; i < prms.Count; i++)
+        for (int i = 0; i < prms.Count; i++)
         {
             il.Emit(OpCodes.Dup);
             il.Emit(OpCodes.Ldc_I4, i);

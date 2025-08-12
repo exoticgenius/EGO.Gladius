@@ -1,5 +1,6 @@
-﻿using EGO.Gladius.Contracts;
-using EGO.Gladius.DataTypes;
+﻿using EGO.Gladius.DataTypes;
+
+using System.Runtime.CompilerServices;
 
 namespace EGO.Gladius.Extensions;
 
@@ -86,6 +87,7 @@ public static class TDSPR_Sync_See
 
 public static class TDSPR_To_Async_To
 {
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<T, ValueTask<R>> del)
     {
         try
@@ -117,6 +119,7 @@ public static class TDSPR_To_Async_To
     }
 
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<T, ValueTask<SPR<R>>> del)
     {
         try
@@ -148,6 +151,7 @@ public static class TDSPR_To_Async_To
     }
 
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask<R>> del)
     {
         try
@@ -179,6 +183,7 @@ public static class TDSPR_To_Async_To
     }
 
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
     {
         try
@@ -211,6 +216,7 @@ public static class TDSPR_To_Async_To
 }
 public static class TDSPR_To_Async_See
 {
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<T>> See<T>(this TDSPR<T> spr, Func<T, ValueTask> del)
     {
         try
@@ -242,6 +248,7 @@ public static class TDSPR_To_Async_See
     }
 
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<T>> See<T>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask> del)
     {
         try
@@ -278,7 +285,7 @@ public static class TDSPR_From_ValueTask_To
 {
     public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, R> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -294,7 +301,7 @@ public static class TDSPR_From_ValueTask_To
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, SPR<R>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -310,7 +317,7 @@ public static class TDSPR_From_ValueTask_To
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, SPR<R>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -327,7 +334,7 @@ public static class TDSPR_From_ValueTask_To
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, Task<R>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -343,7 +350,7 @@ public static class TDSPR_From_ValueTask_To
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, Task<SPR<R>>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -359,7 +366,7 @@ public static class TDSPR_From_ValueTask_To
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task<SPR<R>>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -374,9 +381,10 @@ public static class TDSPR_From_ValueTask_To
     }
 
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, ValueTask<R>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -390,9 +398,10 @@ public static class TDSPR_From_ValueTask_To
         }
     }
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, ValueTask<SPR<R>>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -406,9 +415,10 @@ public static class TDSPR_From_ValueTask_To
         }
     }
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -426,7 +436,7 @@ public static class TDSPR_From_ValueTask_See
 {
     public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Action<T> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -442,7 +452,7 @@ public static class TDSPR_From_ValueTask_See
 
     public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Action<TDSPR<T>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -459,7 +469,7 @@ public static class TDSPR_From_ValueTask_See
 
     public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Func<T, Task> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -475,7 +485,7 @@ public static class TDSPR_From_ValueTask_See
 
     public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -490,9 +500,10 @@ public static class TDSPR_From_ValueTask_See
     }
 
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Func<T, ValueTask> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -506,9 +517,10 @@ public static class TDSPR_From_ValueTask_See
         }
     }
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -528,7 +540,7 @@ public static class TDSPR_From_Task_To
 {
     public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, R> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -544,7 +556,7 @@ public static class TDSPR_From_Task_To
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, SPR<R>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -560,7 +572,7 @@ public static class TDSPR_From_Task_To
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, SPR<R>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -577,7 +589,7 @@ public static class TDSPR_From_Task_To
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, Task<R>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -593,7 +605,7 @@ public static class TDSPR_From_Task_To
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, Task<SPR<R>>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -609,7 +621,7 @@ public static class TDSPR_From_Task_To
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task<SPR<R>>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -624,9 +636,10 @@ public static class TDSPR_From_Task_To
     }
 
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, ValueTask<R>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -640,9 +653,10 @@ public static class TDSPR_From_Task_To
         }
     }
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, ValueTask<SPR<R>>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -656,9 +670,10 @@ public static class TDSPR_From_Task_To
         }
     }
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -676,7 +691,7 @@ public static class TDSPR_From_Task_See
 {
     public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Action<T> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -692,7 +707,7 @@ public static class TDSPR_From_Task_See
 
     public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Action<TDSPR<T>> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -709,7 +724,7 @@ public static class TDSPR_From_Task_See
 
     public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Func<T, Task> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -725,7 +740,7 @@ public static class TDSPR_From_Task_See
 
     public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -740,9 +755,10 @@ public static class TDSPR_From_Task_See
     }
 
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Func<T, ValueTask> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -756,9 +772,10 @@ public static class TDSPR_From_Task_See
         }
     }
 
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask> del)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             if (spr.Succeed())
@@ -849,7 +866,7 @@ public static class TDSPR_To_Void
 {
     public static async ValueTask<TDVSP> Void<T>(this ValueTask<TDSPR<T>> taskSpr)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             return spr.Void();
@@ -862,7 +879,7 @@ public static class TDSPR_To_Void
 
     public static async ValueTask<TDVSP> Void<T>(this Task<TDSPR<T>> taskSpr)
     {
-        var spr = await taskSpr;
+        TDSPR<T> spr = await taskSpr;
         try
         {
             return spr.Void();

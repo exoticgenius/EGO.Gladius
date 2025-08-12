@@ -9,10 +9,10 @@ public static class DSPRExtensions
 
     public static async Task<O_DSPR<R>> Transform<T, R>(this Task<O_DSPR<T>> task, [NotNull] Func<T, R> del) where T : IDisposable, IAsyncDisposable
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(del(res));
@@ -25,10 +25,10 @@ public static class DSPRExtensions
 
     public static async Task<O_DSPR<R>> Transform<T, R>(this Task<O_DSPR<T>> task, [NotNull] Func<T, O_SPR<R>> del) where T : IDisposable, IAsyncDisposable
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(del(res));
@@ -41,10 +41,10 @@ public static class DSPRExtensions
 
     public static async Task<O_DSPR<R>> Transform<T, R>(this Task<O_DSPR<T>> task, [NotNull] Func<T, Task<R>> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(await del(res));
@@ -57,10 +57,10 @@ public static class DSPRExtensions
 
     public static async Task<O_DSPR<R>> Transform<T, R>(this Task<O_DSPR<T>> task, [NotNull] Func<T, Task<O_SPR<R>>> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(await del(res));
@@ -73,10 +73,10 @@ public static class DSPRExtensions
 
     public static async ValueTask<O_DSPR<R>> Transform<T, R>(this ValueTask<O_DSPR<T>> task, [NotNull] Func<T, R> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(del(res));
@@ -89,10 +89,10 @@ public static class DSPRExtensions
 
     public static async ValueTask<O_DSPR<R>> Transform<T, R>(this ValueTask<O_DSPR<T>> task, [NotNull] Func<T, O_SPR<R>> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(del(res));
@@ -105,10 +105,10 @@ public static class DSPRExtensions
 
     public static async ValueTask<O_DSPR<R>> Transform<T, R>(this ValueTask<O_DSPR<T>> task, [NotNull] Func<T, Task<R>> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(await del(res));
@@ -121,10 +121,10 @@ public static class DSPRExtensions
 
     public static async ValueTask<O_DSPR<R>> Transform<T, R>(this ValueTask<O_DSPR<T>> task, [NotNull] Func<T, Task<O_SPR<R>>> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(await del(res));
@@ -137,10 +137,10 @@ public static class DSPRExtensions
 
     public static async ValueTask<O_DSPR<R>> Transform<T, R>(this ValueTask<O_DSPR<T>> task, [NotNull] Func<T, ValueTask<R>> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(await del(res));
@@ -153,10 +153,10 @@ public static class DSPRExtensions
 
     public static async ValueTask<O_DVSP> Transform<T>(this ValueTask<O_DSPR<T>> task, [NotNull] Func<T, ValueTask<O_VSP>> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.ToDVSP();
 
             return taskDSPR.ToDVSP().Pass(await del(res));
@@ -169,10 +169,10 @@ public static class DSPRExtensions
 
     public static async ValueTask<O_DSPR<R>> Transform<T, R>(this ValueTask<O_DSPR<T>> task, [NotNull] Func<T, ValueTask<O_SPR<R>>> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(await del(res));
@@ -185,10 +185,10 @@ public static class DSPRExtensions
 
     public static async ValueTask<O_DSPR<R>> Transform<T, R>(this Task<O_DSPR<T>> task, [NotNull] Func<T, ValueTask<R>> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(await del(res));
@@ -201,10 +201,10 @@ public static class DSPRExtensions
 
     public static async ValueTask<O_DSPR<R>> Transform<T, R>(this Task<O_DSPR<T>> task, [NotNull] Func<T, ValueTask<O_SPR<R>>> del)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         try
         {
-            if (!taskDSPR.Succeed(out var res))
+            if (!taskDSPR.Succeed(out T? res))
                 return taskDSPR.Fault<R>();
 
             return taskDSPR.Pass(await del(res));
@@ -258,12 +258,12 @@ public static class DSPRExtensions
 #pragma warning restore CA1849 // Call async methods when in an async method
     public static async ValueTask<O_DVSP> ToDVSP<T>(this ValueTask<O_DSPR<T>> task)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         return taskDSPR.ToDVSP();
     }
     public static async ValueTask<O_SPR<T>> ToSPR<T>(this ValueTask<O_DSPR<T>> task)
     {
-        var taskDSPR = await task;
+        O_DSPR<T> taskDSPR = await task;
         return taskDSPR.SPR;
     }
 }

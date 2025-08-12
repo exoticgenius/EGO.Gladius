@@ -8,10 +8,10 @@ public static class SPRExtensions
 {
     public static async Task<O_SPR<R>> Transform<T, R>(this Task<O_SPR<T>> task, Func<T, R> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return del(res);
@@ -24,10 +24,10 @@ public static class SPRExtensions
 
     public static async Task<O_SPR<R>> Transform<T, R>(this Task<O_SPR<T>> task, Func<T, O_SPR<R>> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return del(res);
@@ -40,10 +40,10 @@ public static class SPRExtensions
 
     public static async Task<O_SPR<R>> Transform<T, R>(this Task<O_SPR<T>> task, Func<T, ValueTask<R>> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return await del(res);
@@ -56,10 +56,10 @@ public static class SPRExtensions
 
     public static async Task<O_SPR<R>> Transform<T, R>(this Task<O_SPR<T>> task, Func<T, Task<O_SPR<R>>> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return await del(res);
@@ -72,10 +72,10 @@ public static class SPRExtensions
 
     public static async ValueTask<O_SPR<R>> Transform<T, R>(this ValueTask<O_SPR<T>> task, Func<T, R> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return del(res);
@@ -88,10 +88,10 @@ public static class SPRExtensions
 
     public static async ValueTask<O_SPR<R>> Transform<T, R>(this ValueTask<O_SPR<T>> task, Func<T, O_SPR<R>> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return del(res);
@@ -104,10 +104,10 @@ public static class SPRExtensions
 
     public static async ValueTask<O_SPR<R>> Transform<T, R>(this ValueTask<O_SPR<T>> task, Func<T, Task<O_SPR<R>>> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return await del(res);
@@ -120,10 +120,10 @@ public static class SPRExtensions
 
     public static async ValueTask<O_SPR<R>> Transform<T, R>(this ValueTask<O_SPR<T>> task, Func<T, ValueTask<R>> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return await del(res);
@@ -136,10 +136,10 @@ public static class SPRExtensions
 
     public static async ValueTask<O_SPR<R>> Transform<T, R>(this ValueTask<O_SPR<T>> task, Func<T, ValueTask<O_SPR<R>>> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return await del(res);
@@ -152,10 +152,10 @@ public static class SPRExtensions
 
     public static async ValueTask<O_SPR<R>> Transform<T, R>(this Task<O_SPR<T>> task, Func<T, ValueTask<O_SPR<R>>> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return await del(res);
@@ -168,10 +168,10 @@ public static class SPRExtensions
 
     public static async ValueTask<O_VSP> Transform<T>(this Task<O_SPR<T>> task, Func<T, ValueTask<O_VSP>> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return await del(res);
@@ -184,7 +184,7 @@ public static class SPRExtensions
 
     public static async ValueTask<O_VSP> ToVSP<T>(this ValueTask<O_SPR<T>> task)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
 
         if (!taskSPR.Succeed())
             return taskSPR.Fault;
@@ -194,7 +194,7 @@ public static class SPRExtensions
 
     public static async ValueTask<O_VSP> ToVSP<T>(this Task<O_SPR<T>> task)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
 
         if (!taskSPR.Succeed())
             return taskSPR.Fault;
@@ -204,10 +204,10 @@ public static class SPRExtensions
 
     public static async ValueTask<O_VSP> ToVSP<T>(this ValueTask<O_SPR<T>> task, [NotNull] Func<T, O_VSP> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return del(res);
@@ -220,10 +220,10 @@ public static class SPRExtensions
 
     public static async ValueTask<O_VSP> ToVSP<T>(this Task<O_SPR<T>> task, [NotNull] Func<T, O_VSP> del)
     {
-        var taskSPR = await task;
+        O_SPR<T> taskSPR = await task;
         try
         {
-            if (!taskSPR.Succeed(out var res))
+            if (!taskSPR.Succeed(out T? res))
                 return taskSPR.Fault;
 
             return del(res);
