@@ -45,7 +45,7 @@ public static class MigratorExtensions_TSPR_TO_TDSPR
         var spr = await taskSpr;
         return new TDSPR<T>(spr.Value, spr.Fault, ((ITSP)spr).Transactions).MarkDispose(index);
     }
-    public static ValueTask<TDSPR<T>> MarkDispose<T, E>(this Task<TSPR<T>> taskSpr, E index) =>
+    public static ValueTask<TDSPR<T>> MarkDispose<T, E>(this Task<TSPR<T>> taskSpr, E index) where T : IDisposable, IAsyncDisposable where E : Enum =>
         MarkDispose(taskSpr, Convert.ToInt16(index));
 
     [OverloadResolutionPriority(1)]
