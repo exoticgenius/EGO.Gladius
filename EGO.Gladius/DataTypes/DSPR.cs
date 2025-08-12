@@ -26,6 +26,13 @@ public struct DSPR<T> : IDSP<DSPR<T>, SPR<T>, T>, ISPRDescendable<SPR<T>>, ISPRV
     }
     public DSPR(
         SPV<T> value,
+        SPF fault)
+    {
+        Value = value;
+        Fault = fault;
+    }
+    public DSPR(
+        SPV<T> value,
         SPF fault,
         List<KeyValuePair<short, IDisposable>>? disposables,
         List<KeyValuePair<short, IAsyncDisposable>>? asyncDisposables)

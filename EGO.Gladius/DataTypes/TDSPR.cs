@@ -29,6 +29,26 @@ public struct TDSPR<T> : ITSP<TDSPR<T>, DSPR<T>, T>, IDSP<TDSPR<T>, TSPR<T>, T>,
     public TDSPR(
        SPV<T> value,
        SPF fault,
+       List<KeyValuePair<short, TransactionScope>>? transactions)
+    {
+        Value = value;
+        Fault = fault;
+        _transactions = transactions;
+    }
+    public TDSPR(
+       SPV<T> value,
+       SPF fault,
+       List<KeyValuePair<short, IDisposable>>? disposables,
+       List<KeyValuePair<short, IAsyncDisposable>>? asyncDisposables)
+    {
+        Value = value;
+        Fault = fault;
+        _disposables = disposables;
+        _asyncDisposables = asyncDisposables;
+    }
+    public TDSPR(
+       SPV<T> value,
+       SPF fault,
        List<KeyValuePair<short, TransactionScope>>? transactions,
        List<KeyValuePair<short, IDisposable>>? disposables,
        List<KeyValuePair<short, IAsyncDisposable>>? asyncDisposables)

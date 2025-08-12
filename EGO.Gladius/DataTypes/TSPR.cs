@@ -24,6 +24,13 @@ public struct TSPR<T> : ITSP<TSPR<T>, SPR<T>, T>, ISPRDescendable<SPR<T>>, ISPRV
     }
     internal TSPR(
         SPV<T> val,
+        SPF fault)
+    {
+        Value = val;
+        Fault = fault;
+    }
+    internal TSPR(
+        SPV<T> val,
         SPF fault,
         List<KeyValuePair<short, TransactionScope>>? transactions)
     {
