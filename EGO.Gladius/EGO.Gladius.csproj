@@ -9,13 +9,20 @@
     <FileVersion>0.1.0</FileVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>EGO.Gladius</Title>
-    <PackageOutputPath>$(OutputPath)\nuget</PackageOutputPath>
+    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
     <PackAsTool>False</PackAsTool>
     <PackageProjectUrl>https://github.com/exoticgenius/EGO.Gladius</PackageProjectUrl>
     <RepositoryUrl>https://github.com/exoticgenius/EGO.Gladius</RepositoryUrl>
-    <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>lisence.md</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="lisence.md">
@@ -23,5 +30,5 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
-
+	
 </Project>

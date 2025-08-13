@@ -162,7 +162,7 @@ public struct TDSPR<T> : ITSP<TDSPR<T>, DSPR<T>, T>, IDSP<TDSPR<T>, TSPR<T>, T>,
         return new TSPR<T>(
             Value,
             Fault,
-            (_transactions);
+            _transactions);
     }
 
     public async ValueTask<TDSPR<T>> DisposeAsync(short index = -1)

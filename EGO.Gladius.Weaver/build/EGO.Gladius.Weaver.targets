@@ -1,0 +1,5 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="EGO.Gladius.Weaver" AfterTargets="Build">
+    <Exec Command="dotnet $(MSBuildThisPackageDirectory)\EGO.Gladius.Weaver.exe $(TargetPath)" />
+  </Target>
+</Project>
