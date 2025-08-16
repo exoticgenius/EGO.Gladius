@@ -36,6 +36,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\EGO.Gladius\EGO.Gladius.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Update="lisence.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>

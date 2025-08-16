@@ -1,17 +1,23 @@
 ﻿using EGO.Gladius.DataTypes;
 using EGO.Gladius.Extensions;
 
-SPR<int> res = await SPR.FromResult(1).To(Transform).To(async x => await Transform(x));
-
-
-
-
-Console.ReadLine();
-
-async Task<int> Transform(int x)
+namespace DEF
 {
-    await Task.Delay(1000);
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            Console.WriteLine("before");
+            SPR<int> res = SPR.FromResult(1).To(Transform).To(Transform);
+            Console.WriteLine("after");
 
-    return x + 2;
+            Console.ReadLine();
+        }
+
+        public  static int Transform(int x)
+        {
+            Console.WriteLine("inner");
+            return x + 2;
+        }
+    }
 }
-
