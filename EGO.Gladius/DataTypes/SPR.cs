@@ -209,7 +209,7 @@ public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
     public SPR()
     {
     }
-    internal SPR(SPF fault)
+    public SPR(SPF fault)
     {
         Value = default;
         Fault = fault;
