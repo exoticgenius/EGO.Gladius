@@ -141,7 +141,8 @@ class Program
                 target = item;
                 targetInstructions = instrs;
                 lastCatcher = instrs[^1];
-                instrs[1..^1].ForEach(x => il.Replace(x, il.Create(OpCodes.Nop)));
+                //instrs[1..^1].ForEach(x => il.Replace(x, il.Create(OpCodes.Nop)));
+                instrs[1..^1].ForEach(x => method.Body.Instructions.Remove(x));
                 method.Body.ExceptionHandlers.Remove(target); 
                 break;
             }
@@ -151,7 +152,7 @@ class Program
 
         var retVar = method.Body.Variables.First(x => x.VariableType.Resolve() == ((Mono.Cecil.GenericInstanceType)methodBase.ReturnType).GenericArguments[0].Resolve());
 
-        var exVar = method.Body.Variables.First(x => x.VariableType.Resolve() == asm.MainModule.ImportReference(typeof(Exception)).Resolve());
+        var exVar = method.Body.Variables.Last(x => x.VariableType.Resolve() == asm.MainModule.ImportReference(typeof(Exception)).Resolve());
 
         // labels
         //var ret = il.Create(OpCodes.Ret);

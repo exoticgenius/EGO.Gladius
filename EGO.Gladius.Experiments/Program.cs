@@ -19,7 +19,6 @@ namespace DEF
             //else
             //    Console.WriteLine(res.Fault.Exception.Message ?? res.Fault.Message);
 
-            Transform(1);
             var res =  await Transform(3);
 
             Console.WriteLine(res.Fault.Exception?.Message);
@@ -31,11 +30,22 @@ namespace DEF
 
         public static async Task<SPR<int>> Transform(int x)
         {
-            await Task.Delay(33);
-                Console.WriteLine("inner");
-                if (x == 3)
-                    throw new Exception("catch 3");
-                return x + 2;
+                try
+                {
+                    await Task.Delay(33);
+                    Console.WriteLine("inner");
+                    if (x == 3)
+                        throw new Exception("catch 3");
+                    return x + 2;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("catch 4");
+                }
+                finally
+                {
+                    Console.WriteLine("zsd,fjghdruighr");
+                }
         }
     }
 }
