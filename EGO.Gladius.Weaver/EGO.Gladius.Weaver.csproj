@@ -19,7 +19,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <Optimize>False</Optimize>
+	  <Optimize>True</Optimize>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="build\EGO.Gladius.Weaver.targets" Pack="true" PackagePath="build\" />

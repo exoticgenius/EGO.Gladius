@@ -20,47 +20,62 @@ class Program
             FileOptions.RandomAccess);
 
         var cw = new FileStream(sfh, FileAccess.ReadWrite);
-        
+
         var asm = AssemblyDefinition.ReadAssembly(cw, new ReaderParameters { ReadWrite = true });
         foreach (var method in asm.MainModule.Types.SelectMany(t => t.Methods).Where(m => m.HasBody))
         {
-            if (method.Name != "Transform") 
+            if (method.Name != "Transform")
                 continue;
 
             var il = method.Body.GetILProcessor();
             var oldInstr = method.Body.Instructions.ToList();
-            method.Body.Instructions.Clear();
+            var first = oldInstr.First();
+            var last = oldInstr.Last();
 
-            foreach (var i in oldInstr) il.Append(i);
-            il.Append(il.Create(OpCodes.Ldstr, "str to write"));
-            var writeLine = asm.MainModule.ImportReference(typeof(Console).GetMethod("WriteLine", new[] { typeof(string) }));
-            il.Append(il.Create(OpCodes.Call, writeLine));
+            var retType = asm.MainModule.ImportReference(method.ReturnType);
+            var retVar = new VariableDefinition(retType);
+            method.Body.Variables.Add(retVar);
 
-            il.Append(il.Create(OpCodes.Ret));
+            var exType = asm.MainModule.ImportReference(typeof(Exception));
+            var exVar = new VariableDefinition(exType);
+            method.Body.Variables.Add(exVar);
 
-
-
-
-            var write = il.Create(
-                OpCodes.Call,
-                module.Import(typeof(Console).GetMethod("WriteLine", new[] { typeof(object) })));
+            //var writeLine = asm.MainModule.ImportReference(typeof(Console).GetMethod("WriteLine", new[] { typeof(string) }));
+            //il.InsertBefore(first, il.Create(OpCodes.Ldstr, "Hello from Cecil"));
+            //il.InsertBefore(first, il.Create(OpCodes.Call, writeLine));
             var ret = il.Create(OpCodes.Ret);
-            var leave = il.Create(OpCodes.Leave, ret);
+            var loadRet = il.Create(OpCodes.Ldloc_S, retVar);
+            var storeEx = il.Create(OpCodes.Stloc, exVar);
 
-            il.InsertAfter(
-                method.Body.Instructions.Last(),
-                write);
+            var storeRet = il.Create(OpCodes.Stloc, retVar);
+            il.Replace(last, storeRet);
+            
+            il.Append(il.Create(OpCodes.Leave, loadRet));
 
-            il.InsertAfter(write, leave);
-            il.InsertAfter(leave, ret);
+
+            var point = il.Create(OpCodes.Nop);
+            il.Append(point);
+
+            il.Append(storeEx);
+            il.Append(il.Create(OpCodes.Ldc_I4, 10));
+            il.Append(il.Create(OpCodes.Stloc_S, retVar));
+
+            il.Append(il.Create(OpCodes.Leave, loadRet));
+
+            var cartchEnd = il.Create(OpCodes.Nop);
+            il.Append(cartchEnd);
+
+            il.Append(loadRet);
+            il.Append(ret);
+
 
             var handler = new ExceptionHandler(ExceptionHandlerType.Catch)
             {
-                TryStart = method.Body.Instructions.First(),
-                TryEnd = write,
-                HandlerStart = write,
-                HandlerEnd = ret,
-                CatchType = asm.MainModule.ImportReference(typeof(Exception)),
+                TryStart = first,
+                TryEnd = point,
+                HandlerStart = point,
+                HandlerEnd = cartchEnd,
+                CatchType = asm.MainModule.ImportReference(typeof(System.Exception)),
             };
 
             method.Body.ExceptionHandlers.Add(handler);
