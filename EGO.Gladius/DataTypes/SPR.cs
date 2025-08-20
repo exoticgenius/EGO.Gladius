@@ -269,6 +269,8 @@ public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
     #endregion core funcs
 
     #region Operators
+    public static implicit operator SPR<T>(in SPR tag) =>
+        new(new SPV<T>(true), default);
     public static implicit operator SPR<T>(in T val) =>
         new(val, default);
 

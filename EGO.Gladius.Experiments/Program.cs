@@ -19,7 +19,7 @@ namespace DEF
             //else
             //    Console.WriteLine(res.Fault.Exception.Message ?? res.Fault.Message);
 
-            var res =  await Transform(3);
+            var res = Transform(3);
 
             Console.WriteLine(res.Fault.Exception?.Message);
 
@@ -28,24 +28,28 @@ namespace DEF
             Console.ReadLine();
         }
 
-        public static async Task<SPR<int>> Transform(int x)
+        public static SPR<int> Transform(int x)
         {
-                try
-                {
-                    await Task.Delay(33);
-                    Console.WriteLine("inner");
-                    if (x == 3)
-                        throw new Exception("catch 3");
-                    return x + 2;
-                }
-                catch (Exception e)
-                {
-                    throw new Exception("catch 4");
-                }
-                finally
-                {
-                    Console.WriteLine("zsd,fjghdruighr");
-                }
+            if (x == 44)
+                return x + 44;
+
+            else if (x == 109)
+                throw new Exception("plain ex");
+
+            if (x == 45)
+                return SPF.Gen("fault");
+
+            if (x == 46)
+                return SPR.Completed;
+
+            switch (x)
+            {
+                case 1: return 2;
+
+                case 2: return 2;
+                default:
+                    throw new Exception("sw def");
+            }
         }
     }
 }

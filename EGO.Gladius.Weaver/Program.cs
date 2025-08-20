@@ -31,9 +31,9 @@ class Program
             if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
             {
                 handleNormal(asm, method);
-                
+
             }
-            else if(method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve())
+            else if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve())
             {
                 handleTask(asm, method);
 
@@ -66,10 +66,18 @@ class Program
         var ret = il.Create(OpCodes.Ret);
         var loadRet = il.Create(OpCodes.Ldloc_S, retVar);
 
-        // hooks and of method to leave peacefully out of try block
-        var storeRet = il.Create(OpCodes.Stloc, retVar);
-        il.Replace(last, storeRet);
-        il.Emit(OpCodes.Leave, loadRet);
+        // hooks end of method to leave peacefully out of try block
+        foreach (var item in oldInstr)
+        {
+            if (item.OpCode == OpCodes.Ret)
+            {
+
+                il.InsertBefore(item, il.Create(OpCodes.Stloc, retVar));
+                il.Replace(item, il.Create(OpCodes.Leave, loadRet));
+            }
+        }
+
+
 
         // catch block
         il.Append(catchStart);
@@ -93,16 +101,12 @@ class Program
         il.Emit(OpCodes.Newobj, spfCtor);
         il.Emit(OpCodes.Newobj, retCtor);
 
-
-
-
-
         il.Emit(OpCodes.Stloc_S, retVar);
-
-
-
         il.Emit(OpCodes.Leave, loadRet);
+
+
         il.Append(catchEnd);
+
 
         il.Append(loadRet);
         il.Append(ret);
@@ -143,7 +147,7 @@ class Program
                 lastCatcher = instrs[^1];
                 //instrs[1..^1].ForEach(x => il.Replace(x, il.Create(OpCodes.Nop)));
                 instrs[1..^1].ForEach(x => method.Body.Instructions.Remove(x));
-                method.Body.ExceptionHandlers.Remove(target); 
+                method.Body.ExceptionHandlers.Remove(target);
                 break;
             }
         }
