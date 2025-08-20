@@ -1,4 +1,5 @@
 ﻿using EGO.Gladius.DataTypes;
+using EGO.Gladius.Metadata;
 
 using Microsoft.Win32.SafeHandles;
 
@@ -11,42 +12,59 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+[assembly: LibrarySkipper]
 class Program
 {
     static void Main(string[] args)
     {
-        //var path = args[0];
-        var path = "C:\\Users\\f.sadeghi\\source\\repos\\EGO.Gladius\\EGO.Gladius.Experiments\\bin\\Debug\\net9.0\\EGO.Gladius.Experiments.dll";
-        SafeFileHandle sfh = File.OpenHandle(path,
-            FileMode.Open,
-            FileAccess.ReadWrite,
-            FileShare.ReadWrite,
-            FileOptions.RandomAccess);
+        if (args.Length == 0)
+            return;
 
-        var cw = new FileStream(sfh, FileAccess.ReadWrite);
-
-        var asm = AssemblyDefinition.ReadAssembly(cw, new ReaderParameters { ReadWrite = true });
-        foreach (var method in asm.MainModule.Types.SelectMany(t => t.Methods).Where(m => m.HasBody))
+        Console.WriteLine("EGO Gladius Weaver: starting to weave dlls");
+        foreach (var path in args)
         {
-            if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
-            {
-                handleNormal(asm, method);
+            Console.WriteLine("weaving: " + path);
 
-            }
-            else if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve())
-            {
-                handleTask(asm, method);
+            SafeFileHandle sfh = File.OpenHandle(path,
+                FileMode.Open,
+                FileAccess.ReadWrite,
+                FileShare.ReadWrite,
+                FileOptions.RandomAccess);
 
+            try
+            {
+                var cw = new FileStream(sfh, FileAccess.ReadWrite);
+
+                var asm = AssemblyDefinition.ReadAssembly(cw, new ReaderParameters { ReadWrite = true });
+
+                if (!asm.CustomAttributes.Any(x => x.AttributeType.Resolve() == asm.MainModule.ImportReference(typeof(LibrarySkipper)).Resolve()))
+                {
+                    foreach (var method in asm.MainModule.Types.SelectMany(t => t.Methods).Where(m => m.HasBody))
+                    {
+                        if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
+                        {
+                            handleNormal(asm, method);
+
+                        }
+                        else if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve())
+                        {
+                            handleTask(asm, method);
+
+                        }
+                    }
+                    asm.Write(cw);
+                }
             }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            sfh.Close();
         }
-        asm.Write(cw);
     }
 
     private static void handleNormal(AssemblyDefinition asm, MethodDefinition method)
     {
-        if (method.Name != "Transform")
-            return;
-
         var il = method.Body.GetILProcessor();
         var oldInstr = method.Body.Instructions.ToList();
         var first = oldInstr.First();
@@ -126,7 +144,11 @@ class Program
     }
     private static void handleTask(AssemblyDefinition asm, MethodDefinition methodBase)
     {
-        var method = ((TypeDefinition)methodBase.CustomAttributes[0].ConstructorArguments[0].Value).Methods.First(x => x.Name == "MoveNext");
+        var method = ((TypeDefinition)methodBase.CustomAttributes
+            .First(a => a.AttributeType.FullName == typeof(System.Runtime.CompilerServices.AsyncStateMachineAttribute).FullName)
+            .ConstructorArguments[0].Value)
+            .Methods
+            .First(x => x.Name == "MoveNext");
 
         var oldHandlers = method.Body.ExceptionHandlers;
         ExceptionHandler target = null;

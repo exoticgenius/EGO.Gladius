@@ -1,5 +1,8 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Target Name="EGO.Gladius.Weaver" AfterTargets="Build">
-    <Exec Command="dotnet $(MSBuildThisPackageDirectory)\EGO.Gladius.Weaver.exe $(TargetPath)" />
-  </Target>
+<Project>
+	<Target Name="RunAfterBuild" AfterTargets="Build">
+		<ItemGroup>
+			<BuiltDlls Include="$(TargetDir)*.dll" />
+		</ItemGroup>
+		<Exec Command="dotnet exec &quot;$(MSBuildThisFileDirectory)..\tools\net8.0\any\EGO.Gladius.Weaver.dll&quot; @(BuiltDlls->'&quot;%(FullPath)&quot;', ' ')" />
+	</Target>
 </Project>

@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EGO.Gladius.DI", "EGO.Gladi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EGO.Gladius.Weaver", "EGO.Gladius.Weaver\EGO.Gladius.Weaver.csproj", "{D0DA2D41-003D-47C4-B276-9FB81D09E126}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EGO.Gladius.Tests", "EGO.Gladius.Tests\EGO.Gladius.Tests.csproj", "{04577495-668F-48D0-8A6F-CF92D111C317}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{D0DA2D41-003D-47C4-B276-9FB81D09E126}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0DA2D41-003D-47C4-B276-9FB81D09E126}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0DA2D41-003D-47C4-B276-9FB81D09E126}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04577495-668F-48D0-8A6F-CF92D111C317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04577495-668F-48D0-8A6F-CF92D111C317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04577495-668F-48D0-8A6F-CF92D111C317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04577495-668F-48D0-8A6F-CF92D111C317}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

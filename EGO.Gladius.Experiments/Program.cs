@@ -1,6 +1,5 @@
 ﻿using EGO.Gladius.DataTypes;
 using EGO.Gladius.Extensions;
-
 namespace DEF
 {
     public class Program
@@ -31,7 +30,7 @@ namespace DEF
         public static SPR<int> Transform(int x)
         {
             if (x == 44)
-                return x + 44;
+                conv(x);
 
             else if (x == 109)
                 throw new Exception("plain ex");
@@ -49,6 +48,16 @@ namespace DEF
                 case 2: return 2;
                 default:
                     throw new Exception("sw def");
+            }
+
+            int conv(int z)
+            {
+                return z + C3(z) * 2;
+
+                int C3(int xx)
+                {
+                    return x + 1;
+                }
             }
         }
     }
