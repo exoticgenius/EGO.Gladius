@@ -1,5 +1,4 @@
 ﻿using EGO.Gladius.DataTypes;
-using EGO.Gladius.Extensions;
 namespace DEF
 {
     public class Program

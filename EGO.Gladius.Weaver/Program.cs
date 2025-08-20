@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 [assembly: LibrarySkipper]
@@ -35,7 +37,7 @@ class Program
             {
                 var cw = new FileStream(sfh, FileAccess.ReadWrite);
 
-                var asm = AssemblyDefinition.ReadAssembly(cw, new ReaderParameters { ReadWrite = true });
+                var asm = AssemblyDefinition.ReadAssembly(cw, new ReaderParameters { ReadWrite = true, ReadSymbols = true });
 
                 if (!asm.CustomAttributes.Any(x => x.AttributeType.Resolve() == asm.MainModule.ImportReference(typeof(LibrarySkipper)).Resolve()))
                 {
@@ -52,14 +54,31 @@ class Program
 
                         }
                     }
-                    asm.Write(cw);
+                    asm.Write(cw, new WriterParameters() { WriteSymbols = true });
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
             sfh.Close();
+            var asms = Assembly.LoadFile(path);
+            foreach (var type in asms.GetTypes())
+            {
+                foreach (var method in type.GetMethods(
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
+                {
+                    try
+                    {
+                        if (method.MethodImplementationFlags.HasFlag(System.Reflection.MethodImplAttributes.IL))
+                            RuntimeHelpers.PrepareMethod(method.MethodHandle);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"{type.FullName}.{method.Name} failed JIT: {ex.GetType().Name} - {ex.Message}");
+                    }
+                }
+            }
         }
     }
 
