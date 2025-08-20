@@ -1,8 +1,13 @@
 ﻿using EGO.Gladius.DataTypes;
+using EGO.Gladius.Extensions;
 namespace DEF
 {
     public class Program
     {
+        public enum TransactionSteps
+        {
+            First
+        }
         public static async Task Main(string[] args)
         {
             Console.WriteLine("before");
@@ -17,7 +22,7 @@ namespace DEF
             //else
             //    Console.WriteLine(res.Fault.Exception.Message ?? res.Fault.Message);
 
-            var res = Transform(3);
+            var res = Transform(3).MarkScope(TransactionSteps.First).CompleteScope(TransactionSteps.First);
 
             Console.WriteLine(res.Fault.Exception?.Message);
 

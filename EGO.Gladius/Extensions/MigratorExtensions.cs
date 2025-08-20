@@ -69,7 +69,7 @@ public static class MigratorExtensions_SPR_TO_TSPR
         var spr = await taskSpr;
         return new TSPR<T>(spr.Value, spr.Fault).MarkScope(index);
     }
-    public static ValueTask<TSPR<T>> MarkScope<T, E>(this Task<SPR<T>> taskSpr, short index = -1) where E : Enum =>
+    public static ValueTask<TSPR<T>> MarkScope<T, E>(this Task<SPR<T>> taskSpr, E index) where E : Enum =>
         MarkScope(taskSpr, Convert.ToInt16(index));
 
     [OverloadResolutionPriority(1)]
@@ -79,7 +79,7 @@ public static class MigratorExtensions_SPR_TO_TSPR
         return new TSPR<T>(spr.Value, spr.Fault).MarkScope(index);
     }
     [OverloadResolutionPriority(1)]
-    public static ValueTask<TSPR<T>> MarkScope<T, E>(this ValueTask<SPR<T>> taskSpr, short index = -1) where E : Enum =>
+    public static ValueTask<TSPR<T>> MarkScope<T, E>(this ValueTask<SPR<T>> taskSpr, E index) where E : Enum =>
         MarkScope(taskSpr, Convert.ToInt16(index));
 }
 
@@ -95,7 +95,7 @@ public static class MigratorExtensions_DSPR_TO_TDSPR
         var spr = await taskSpr;
         return new TDSPR<T>(spr.Value, spr.Fault, ((IDSP)spr).Disposables, ((IDSP)spr).AsyncDisposables).MarkScope(index);
     }
-    public static ValueTask<TDSPR<T>> MarkScope<T, E>(this Task<DSPR<T>> taskSpr, short index = -1) where E : Enum =>
+    public static ValueTask<TDSPR<T>> MarkScope<T, E>(this Task<DSPR<T>> taskSpr, E index) where E : Enum =>
         MarkScope(taskSpr, Convert.ToInt16(index));
 
     [OverloadResolutionPriority(1)]
@@ -105,6 +105,6 @@ public static class MigratorExtensions_DSPR_TO_TDSPR
         return new TDSPR<T>(spr.Value, spr.Fault, ((IDSP)spr).Disposables, ((IDSP)spr).AsyncDisposables).MarkScope(index);
     }
     [OverloadResolutionPriority(1)]
-    public static ValueTask<TDSPR<T>> MarkScope<T, E>(this ValueTask<DSPR<T>> taskSpr, short index = -1) where E : Enum =>
+    public static ValueTask<TDSPR<T>> MarkScope<T, E>(this ValueTask<DSPR<T>> taskSpr, E index) where E : Enum =>
         MarkScope(taskSpr, Convert.ToInt16(index));
 }
