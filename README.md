@@ -1,5 +1,9 @@
 # EGO.Gladius
 Your Simple Sharp tool to Unify Result/Error handling scenarios with maximum Effort for your poor Programmers 💀.
+##The Name
+> Gladius: was a short, double-edged sword designed for thrusting and close combat.
+>
+> just like what programmers do in the IDE battlefield
 
 ## The philosophy is:
 > Any call is not Perfectly Valid Until You Validate it
@@ -11,7 +15,7 @@ Your Simple Sharp tool to Unify Result/Error handling scenarios with maximum Eff
 
 [Base Library](https://www.nuget.org/packages/EGO.Gladius/) <br>
 [Runtime Weaver](https://www.nuget.org/packages/EGO.Gladius.Weaver/)
-
+Install and rush in
 
 ## Get Started
 ```csharp
