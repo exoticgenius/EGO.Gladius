@@ -23,7 +23,7 @@
 
 	<ItemGroup>
 		<None Include="build\EGO.Gladius.Weaver.targets" Pack="true" PackagePath="build\EGO.Gladius.Weaver.targets" />
-		<None Include="$(OutputPath)\" Pack="true" PackagePath="tools\net8.0\any\" />
+		<None Include="$(OutputPath)**\*" Pack="true" PackagePath="tools\net8.0\any\" />
 	</ItemGroup>
 
 
