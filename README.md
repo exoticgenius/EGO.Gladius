@@ -100,3 +100,50 @@ else
     // to have a more robust method with least edge cases and unhandled errors/branches
 }
 ```
+## Extensions
+You are able to Perform Method Chaining and Building Dynamic Blocks of code <br>
+Taking Reusable Codes to the next level <br>
+Internally compatible With Disposable Objects and Transaction Scopes
+
+First Reusable Method
+```csharp
+private enum DisposalIndicator
+{
+	RequestMessage = 0,
+	ResponseMessage = 1,
+	ResponseStream = 2,
+}
+
+ValueTask<DSPR<HttpResponseMessage>> InvokeAsync(
+    HttpClient client,
+    HTTPRequestOptions options) =>
+        BuildQueryString(options.Route, options.QueryItems) // begin of result pattern
+        .To(x => new HttpRequestMessage(options.Method, x)) // transform into next stage
+        .MarkDispose(DisposalIndicator.RequestMessage) // mark and remember disposable object
+        .To(x => BuildMessageHeaders(options.HeaderItems, x))
+        .To(x => BuildMessageBody(options.Payload, x))
+        .To(x => client.SendAsync(x, options.CancellationToken))
+        .MarkDispose(DisposalIndicator.ResponseMessage) // mark and remember another disposable object
+        .Dispose(DisposalIndicator.RequestMessage)  // dispose the first object we marked before
+        .To(x => x.EnsureSuccessStatusCode());
+```
+
+Using FIrst Method and Chain with Further functionality
+```csharp
+
+async ValueTask<VSP> SendAsync(
+	this HttpClient client,
+	HTTPRequestOptions options) =>
+		await InvokeAsync(client, options) // call InvoceAsync and Get the First Part of the Chain
+		.DisposeAll() // dispose all the remembered objedcts and go on
+		.ToVSP(); // get rid of returning object and turn the result to void result only containing Compeleted flag and Fault
+
+static async ValueTask<SPR<T?>> CallAsync<T>(
+	this HttpClient client,
+	HTTPRequestOptions options) =>
+		await InvokeAsync(client, options) // call InvoceAsync and Get the First Part of the Chain
+		.To(x => x.Content.ReadAsStreamAsync()) // Append more login to the chain
+		.MarkDispose(DisposalIndicator.ResponseStream) // mark and remember another disposable object
+		.To(x => JsonSerializer.DeserializeAsync<T>(x))
+		.DisposeAll(); // dispose all the remembered objedcts and go on
+```
