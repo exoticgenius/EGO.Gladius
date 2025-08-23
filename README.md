@@ -1,6 +1,6 @@
 # EGO.Gladius
 Your Simple Sharp tool to Unify Result/Error handling scenarios with maximum Effort for your poor Programmers 💀.
-##The Name
+## The Name
 > Gladius: was a short, double-edged sword designed for thrusting and close combat.
 >
 > just like what programmers do in the IDE battlefield
