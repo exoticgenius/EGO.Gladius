@@ -25,7 +25,9 @@
             run: dotnet build --configuration Release --no-restore
 
           - name: Pack the NuGet package
-            run: dotnet pack --configuration Release --no-build --output .
+            run: dotnet pack EGO.Gladius/EGO.Gladius.csproj --configuration Release --no-build --output .
+                 dotnet pack EGO.Gladius.Weaver/EGO.Gladius.Weaver.csproj --configuration Release --no-build --output .
+
 
           - name: Push to NuGet.org
             run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
