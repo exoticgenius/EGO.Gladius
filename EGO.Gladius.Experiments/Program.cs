@@ -1,4 +1,5 @@
-﻿using EGO.Gladius.DataTypes;
+﻿using EGO.Gladius.Contracts;
+using EGO.Gladius.DataTypes;
 using EGO.Gladius.Extensions;
 namespace DEF
 {
@@ -13,16 +14,50 @@ namespace DEF
             Console.WriteLine("before");
 
 
-            //SPR<int> res = SPR.FromResult(1).To(Transform).To(Transform);
+            SPR<string> result = "Your Result".AsSPR();
 
-            //Console.WriteLine("after");
+            SPR<string> result = GetSomeResult();
 
-            //if (res.Succeed(out var re))
-            //    Console.WriteLine(re);
-            //else
-            //    Console.WriteLine(res.Fault.Exception.Message ?? res.Fault.Message);
+            //if (result.Faulted())
+            //{
+            //    // handle error here using
+            //    var fault = result.Fault;
+            //    fault.Message ...
+            //    fault.Exception ...
+            //    fault.CapturedContext ...
+            //    fault.Parameters ...
+            //}
 
-            var res = Transform(3).MarkScope(TransactionSteps.First).CompleteScope(TransactionSteps.First);
+            if(result.Succeed(out var val))
+            {
+                // if result succeeded you can have the returned value
+            }
+            else
+            {
+                // also you have to implement error handling right here
+                // to have a more robust method with least edge cases and unhandled errors/branches
+            }
+
+
+
+
+
+
+
+
+
+
+
+                //SPR<int> res = SPR.FromResult(1).To(Transform).To(Transform);
+
+                //Console.WriteLine("after");
+
+                //if (res.Succeed(out var re))
+                //    Console.WriteLine(re);
+                //else
+                //    Console.WriteLine(res.Fault.Exception.Message ?? res.Fault.Message);
+
+                var res = Transform(3).MarkScope(TransactionSteps.First).CompleteScope(TransactionSteps.First);
 
             Console.WriteLine(res.Fault.Exception?.Message);
 
@@ -63,6 +98,20 @@ namespace DEF
                     return x + 1;
                 }
             }
+        }
+
+        static bool hasError = true;
+
+        SPR<string> GetSomeResult()
+        {
+
+            if (hasError)
+                throw new Exception("Faulted Here");
+
+            if (hasError)
+                SPF.Gen("Faulted Here");
+
+            return "Processed Result";
         }
     }
 }
