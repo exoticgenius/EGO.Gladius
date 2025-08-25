@@ -11,32 +11,33 @@ namespace DEF
         }
         public static async Task Main(string[] args)
         {
-            Console.WriteLine("before");
+            //Console.WriteLine("before");
 
 
-            SPR<string> result = "Your Result".AsSPR();
+            //SPR<string> result = "Your Result".AsSPR();
 
-            SPR<string> result = GetSomeResult();
+            //SPR<string> result = GetSomeResult();
 
-            //if (result.Faulted())
+            ////if (result.Faulted())
+            ////{
+            ////    // handle error here using
+            ////    var fault = result.Fault;
+            ////    fault.Message ...
+            ////    fault.Exception ...
+            ////    fault.CapturedContext ...
+            ////    fault.Parameters ...
+            ////}
+
+            //if(result.Succeed(out var val))
             //{
-            //    // handle error here using
-            //    var fault = result.Fault;
-            //    fault.Message ...
-            //    fault.Exception ...
-            //    fault.CapturedContext ...
-            //    fault.Parameters ...
+            //    // if result succeeded you can have the returned value
+            //}
+            //else
+            //{
+            //    // also you have to implement error handling right here
+            //    // to have a more robust method with least edge cases and unhandled errors/branches
             //}
 
-            if(result.Succeed(out var val))
-            {
-                // if result succeeded you can have the returned value
-            }
-            else
-            {
-                // also you have to implement error handling right here
-                // to have a more robust method with least edge cases and unhandled errors/branches
-            }
 
 
 
@@ -47,23 +48,22 @@ namespace DEF
 
 
 
+            //    //SPR<int> res = SPR.FromResult(1).To(Transform).To(Transform);
 
-                //SPR<int> res = SPR.FromResult(1).To(Transform).To(Transform);
+            //    //Console.WriteLine("after");
 
-                //Console.WriteLine("after");
+            //    //if (res.Succeed(out var re))
+            //    //    Console.WriteLine(re);
+            //    //else
+            //    //    Console.WriteLine(res.Fault.Exception.Message ?? res.Fault.Message);
 
-                //if (res.Succeed(out var re))
-                //    Console.WriteLine(re);
-                //else
-                //    Console.WriteLine(res.Fault.Exception.Message ?? res.Fault.Message);
+            //    var res = Transform(3).MarkScope(TransactionSteps.First).CompleteScope(TransactionSteps.First);
 
-                var res = Transform(3).MarkScope(TransactionSteps.First).CompleteScope(TransactionSteps.First);
+            //Console.WriteLine(res.Fault.Exception?.Message);
 
-            Console.WriteLine(res.Fault.Exception?.Message);
+            //Console.WriteLine("caught");
 
-            Console.WriteLine("caught");
-
-            Console.ReadLine();
+            //Console.ReadLine();
         }
 
         public static SPR<int> Transform(int x)
