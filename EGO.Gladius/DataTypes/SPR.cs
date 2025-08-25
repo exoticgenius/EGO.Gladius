@@ -100,7 +100,7 @@ public struct SPR : ISP
 
     public static async Task<SPR<T>> TryFor<T>([NotNull] Func<Task<T>> source, int tryFor)
     {
-        Exception caught = null;
+        Exception? caught = null;
         while (tryFor != 0)
         {
             try
@@ -114,7 +114,7 @@ public struct SPR : ISP
             }
         }
 
-        return SPF.Gen(caught);
+        return SPF.Gen(caught!);
     }
 
     public static async Task<SPR<T>> TryFor<T>([NotNull] Func<Task<SPR<T>>> source, int tryFor)

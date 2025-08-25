@@ -3,7 +3,7 @@
 using System.Runtime.CompilerServices;
 
 namespace EGO.Gladius.Extensions;
-
+#nullable disable
 public static class DSPR_Sync_To
 {
     public static DSPR<R> To<T, R>(this DSPR<T> spr, Func<T, R> del)

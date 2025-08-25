@@ -18,7 +18,7 @@ public static class SP
         TypeMapper = new();
     }
 
-    public static Type Extend<T>() =>
+    public static Type? Extend<T>() =>
         Extend(typeof(T));
 
     public static Type? Extend(Type target)
@@ -130,7 +130,7 @@ public static class SP
             if (typeof(VSP).IsAssignableFrom(genArg[0]))
                 suppressor = "SuppressValueTaskVoid";
 
-            il.Emit(OpCodes.Call, typeof(SP).GetMethods().First(x => x.Name == "SuppressValueTask").MakeGenericMethod(genArg));
+            il.Emit(OpCodes.Call, typeof(SP).GetMethods().First(x => x.Name == suppressor).MakeGenericMethod(genArg));
         }
 
         il.Emit(OpCodes.Stloc_0);
@@ -253,7 +253,7 @@ public static class SP
 
 public static class SP<T>
 {
-    private static Type GeneratedType = SP.Extend<T>();
+    private static Type GeneratedType = SP.Extend<T>()!;
 
     public static T Gen(params object?[]? @params)
     {

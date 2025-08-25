@@ -1,6 +1,4 @@
-﻿using EGO.Gladius.Contracts;
-using EGO.Gladius.DataTypes;
-using EGO.Gladius.Extensions;
+﻿using EGO.Gladius.DataTypes;
 namespace DEF
 {
     public class Program
@@ -11,6 +9,8 @@ namespace DEF
         }
         public static async Task Main(string[] args)
         {
+            await Task.Yield();
+
             //Console.WriteLine("before");
 
 
@@ -63,7 +63,7 @@ namespace DEF
 
             //Console.WriteLine("caught");
 
-            //Console.ReadLine();
+            Console.ReadLine();
         }
 
         public static SPR<int> Transform(int x)

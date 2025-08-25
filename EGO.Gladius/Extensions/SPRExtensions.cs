@@ -3,6 +3,7 @@
 using System.Runtime.CompilerServices;
 
 namespace EGO.Gladius.Extensions;
+#nullable disable
 
 public static class SPR_Sync_To
 {
