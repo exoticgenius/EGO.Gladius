@@ -25,7 +25,8 @@
             run: dotnet build --configuration Release --no-restore
 
           - name: Pack the NuGet package
-            run: dotnet pack EGO.Gladius/EGO.Gladius.csproj --configuration Release --no-build --output .
+            run: |
+                 dotnet pack EGO.Gladius/EGO.Gladius.csproj --configuration Release --no-build --output .
                  dotnet pack EGO.Gladius.Weaver/EGO.Gladius.Weaver.csproj --configuration Release --no-build --output .
 
 
