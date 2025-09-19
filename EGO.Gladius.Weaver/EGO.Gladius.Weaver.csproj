@@ -2,16 +2,16 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<StartupObject>Program</StartupObject>
 		
 		<Title>EGO.Gladius.Weaver</Title>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>lisence.md</PackageLicenseFile>
-		<Version>0.1.13-alpha</Version>
-		<AssemblyVersion>0.1.13</AssemblyVersion>
-		<FileVersion>0.1.13</FileVersion>
+		<Version>0.1.14-alpha</Version>
+		<AssemblyVersion>0.1.14</AssemblyVersion>
+		<FileVersion>0.1.14</FileVersion>
 		<PackageProjectUrl>https://github.com/exoticgenius/EGO.Gladius</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/exoticgenius/EGO.Gladius</RepositoryUrl>
 		
