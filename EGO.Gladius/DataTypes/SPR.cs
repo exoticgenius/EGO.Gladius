@@ -276,6 +276,10 @@ public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
 
     public static implicit operator SPR<T>(in SPF fault) =>
         new(fault);
+
+    public static implicit operator SPR<T>(in Exception e) =>
+        new(SPF.Gen(e));
+
     #endregion Operators
 
     #region utils
