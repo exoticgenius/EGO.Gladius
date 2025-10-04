@@ -16,7 +16,7 @@
           - name: Setup .NET
             uses: actions/setup-dotnet@v3
             with:
-              dotnet-version: '9.0' # Specify your .NET version
+              dotnet-version: '10.0' # Specify your .NET version
 
           - name: Restore dependencies
             run: dotnet restore
