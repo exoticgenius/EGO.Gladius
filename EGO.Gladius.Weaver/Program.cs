@@ -34,10 +34,9 @@ class Program
             var cw = new FileStream(sfh, FileAccess.ReadWrite);
             try
             {
-
                 var asm = AssemblyDefinition.ReadAssembly(cw, new ReaderParameters { ReadWrite = true, ReadSymbols = true });
 
-                //if (!asm.CustomAttributes.Any(x => x.AttributeType.Resolve() == asm.MainModule.ImportReference(typeof(LibrarySkipper)).Resolve()))
+                if (!asm.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(LibrarySkipper).FullName))
                 {
                     foreach (var method in asm.MainModule.Types.SelectMany(t => t.Methods).Where(m => m.HasBody))
                     {
