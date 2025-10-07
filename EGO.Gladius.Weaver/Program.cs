@@ -45,13 +45,13 @@ class Program
 					{
 						if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
 						{
-							handleNormal(asm, method);
+							HandleNormal(asm, method);
 
 						}
 						else if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve() ||
 							method.ReturnType.Resolve() == method.Module.ImportReference(typeof(ValueTask<>)).Resolve())
 						{
-							handleTask(asm, method);
+							HandleTask(asm, method);
 
 						}
 					}
@@ -63,27 +63,34 @@ class Program
 				Console.WriteLine(e.Message);
 			}
 			sfh.Close();
-			var asms = Assembly.LoadFile(path);
-			foreach (var type in asms.GetTypes())
+			try
 			{
-				foreach (var method in type.GetMethods(
-					BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
+				var asms = Assembly.LoadFile(path);
+				foreach (var type in asms.GetTypes())
 				{
-					try
+					foreach (var method in type.GetMethods(
+						BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
 					{
-						if (method.MethodImplementationFlags.HasFlag(System.Reflection.MethodImplAttributes.IL))
-							RuntimeHelpers.PrepareMethod(method.MethodHandle);
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine($"{type.FullName}.{method.Name} failed JIT: {ex.GetType().Name} - {ex.Message}");
+						try
+						{
+							if (method.MethodImplementationFlags.HasFlag(System.Reflection.MethodImplAttributes.IL))
+								RuntimeHelpers.PrepareMethod(method.MethodHandle);
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine($"{type.FullName}.{method.Name} failed JIT: {ex.GetType().Name} - {ex.Message}");
+						}
 					}
 				}
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine(e.Message);
 			}
 		}
 	}
 
-	private static void handleNormal(AssemblyDefinition asm, MethodDefinition method)
+	private static void HandleNormal(AssemblyDefinition asm, MethodDefinition method)
 	{
 		var il = method.Body.GetILProcessor();
 		var oldInstr = method.Body.Instructions.ToList();
@@ -162,7 +169,7 @@ class Program
 		method.Body.ExceptionHandlers.Add(handler);
 		return;
 	}
-	private static void handleTask(AssemblyDefinition asm, MethodDefinition methodBase)
+	private static void HandleTask(AssemblyDefinition asm, MethodDefinition methodBase)
 	{
 		var method = ((TypeDefinition)methodBase.CustomAttributes
 			.First(a => a.AttributeType.FullName == typeof(System.Runtime.CompilerServices.AsyncStateMachineAttribute).FullName)
