@@ -37,20 +37,20 @@ public static class TDSPR_Sync_To
         }
     }
 
-    public static TDSPR<R> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, SPR<R>> del)
-    {
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(del(spr));
+    //public static TDSPR<R> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, SPR<R>> del)
+    //{
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 }
 public static class TDSPR_Sync_See
 {
@@ -69,20 +69,20 @@ public static class TDSPR_Sync_See
         }
     }
 
-    public static TDSPR<T> See<T>(this TDSPR<T> spr, Action<TDSPR<T>> del)
-    {
-        try
-        {
-            if (spr.Succeed())
-                del(spr);
+    //public static TDSPR<T> See<T>(this TDSPR<T> spr, Action<TDSPR<T>> del)
+    //{
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            del(spr);
 
-            return spr;
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 }
 
 
@@ -152,68 +152,68 @@ public static class TDSPR_To_Async_To
     }
 
 
-    [OverloadResolutionPriority(1)]
-    public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask<R>> del)
-    {
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(await del(spr));
+    //[OverloadResolutionPriority(1)]
+    //public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask<R>> del)
+    //{
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(await del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
-    public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, Task<R>> del)
-    {
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(await del(spr));
+    //public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, Task<R>> del)
+    //{
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(await del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
 
-    [OverloadResolutionPriority(1)]
-    public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
-    {
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(await del(spr));
+    //[OverloadResolutionPriority(1)]
+    //public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
+    //{
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(await del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
-    public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, Task<SPR<R>>> del)
-    {
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(await del(spr));
+    //public static async ValueTask<TDSPR<R>> To<T, R>(this TDSPR<T> spr, Func<TDSPR<T>, Task<SPR<R>>> del)
+    //{
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(await del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 }
 public static class TDSPR_To_Async_See
 {
@@ -249,36 +249,36 @@ public static class TDSPR_To_Async_See
     }
 
 
-    [OverloadResolutionPriority(1)]
-    public static async ValueTask<TDSPR<T>> See<T>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask> del)
-    {
-        try
-        {
-            if (spr.Succeed())
-                await del(spr);
+    //[OverloadResolutionPriority(1)]
+    //public static async ValueTask<TDSPR<T>> See<T>(this TDSPR<T> spr, Func<TDSPR<T>, ValueTask> del)
+    //{
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            await del(spr);
 
-            return spr;
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
-    public static async ValueTask<TDSPR<T>> See<T>(this TDSPR<T> spr, Func<TDSPR<T>, Task> del)
-    {
-        try
-        {
-            if (spr.Succeed())
-                await del(spr);
+    //public static async ValueTask<TDSPR<T>> See<T>(this TDSPR<T> spr, Func<TDSPR<T>, Task> del)
+    //{
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            await del(spr);
 
-            return spr;
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 }
 
 
@@ -316,21 +316,21 @@ public static class TDSPR_From_ValueTask_To
         }
     }
 
-    public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, SPR<R>> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(del(spr));
+    //public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, SPR<R>> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<T, Task<R>> del)
@@ -365,21 +365,21 @@ public static class TDSPR_From_ValueTask_To
         }
     }
 
-    public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task<SPR<R>>> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(await del(spr));
+    //public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task<SPR<R>>> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(await del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
 
     [OverloadResolutionPriority(1)]
@@ -416,22 +416,22 @@ public static class TDSPR_From_ValueTask_To
         }
     }
 
-    [OverloadResolutionPriority(1)]
-    public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(await del(spr));
+    //[OverloadResolutionPriority(1)]
+    //public static async ValueTask<TDSPR<R>> To<T, R>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(await del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 }
 public static class TDSPR_From_ValueTask_See
 {
@@ -451,21 +451,21 @@ public static class TDSPR_From_ValueTask_See
         }
     }
 
-    public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Action<TDSPR<T>> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                del(spr);
+    //public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Action<TDSPR<T>> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            del(spr);
 
-            return spr;
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
 
     public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Func<T, Task> del)
@@ -484,21 +484,21 @@ public static class TDSPR_From_ValueTask_See
         }
     }
 
-    public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                await del(spr);
+    //public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            await del(spr);
 
-            return spr;
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
 
     [OverloadResolutionPriority(1)]
@@ -518,22 +518,22 @@ public static class TDSPR_From_ValueTask_See
         }
     }
 
-    [OverloadResolutionPriority(1)]
-    public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                await del(spr);
+    //[OverloadResolutionPriority(1)]
+    //public static async ValueTask<TDSPR<T>> See<T>(this ValueTask<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            await del(spr);
 
-            return spr;
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 }
 
 
@@ -571,21 +571,21 @@ public static class TDSPR_From_Task_To
         }
     }
 
-    public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, SPR<R>> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(del(spr));
+    //public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, SPR<R>> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
 
     public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<T, Task<R>> del)
@@ -620,21 +620,21 @@ public static class TDSPR_From_Task_To
         }
     }
 
-    public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task<SPR<R>>> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(await del(spr));
+    //public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task<SPR<R>>> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(await del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
 
     [OverloadResolutionPriority(1)]
@@ -671,22 +671,22 @@ public static class TDSPR_From_Task_To
         }
     }
 
-    [OverloadResolutionPriority(1)]
-    public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                return spr.Pass(await del(spr));
+    //[OverloadResolutionPriority(1)]
+    //public static async ValueTask<TDSPR<R>> To<T, R>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask<SPR<R>>> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            return spr.Pass(await del(spr));
 
-            return spr.Pass<R>(spr.Fault);
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr.Pass<R>(spr.Fault);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 }
 public static class TDSPR_From_Task_See
 {
@@ -706,21 +706,21 @@ public static class TDSPR_From_Task_See
         }
     }
 
-    public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Action<TDSPR<T>> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                del(spr);
+    //public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Action<TDSPR<T>> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            del(spr);
 
-            return spr;
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
 
     public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Func<T, Task> del)
@@ -739,21 +739,21 @@ public static class TDSPR_From_Task_See
         }
     }
 
-    public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                await del(spr);
+    //public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, Task> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            await del(spr);
 
-            return spr;
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 
 
     [OverloadResolutionPriority(1)]
@@ -773,22 +773,22 @@ public static class TDSPR_From_Task_See
         }
     }
 
-    [OverloadResolutionPriority(1)]
-    public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask> del)
-    {
-        TDSPR<T> spr = await taskSpr;
-        try
-        {
-            if (spr.Succeed())
-                await del(spr);
+    //[OverloadResolutionPriority(1)]
+    //public static async ValueTask<TDSPR<T>> See<T>(this Task<TDSPR<T>> taskSpr, Func<TDSPR<T>, ValueTask> del)
+    //{
+    //    TDSPR<T> spr = await taskSpr;
+    //    try
+    //    {
+    //        if (spr.Succeed())
+    //            await del(spr);
 
-            return spr;
-        }
-        catch (Exception e)
-        {
-            return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
-        }
-    }
+    //        return spr;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return spr.Pass<T>(SPF.Gen(del.Method, [spr.Value.Payload], e));
+    //    }
+    //}
 }
 
 public static class TDSPR_Fault_Handlers
