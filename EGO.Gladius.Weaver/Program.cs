@@ -20,7 +20,6 @@ class Program
 {
     static void Main(string[] args)
     {
-        args = ["C:\\Users\\Exoti\\source\\repos\\BNPL_Api\\BNPL\\BNPL.API\\bin\\Debug\\net10.0\\BNPL.Application.dll"];
         foreach (var item in args)
         {
             Console.WriteLine(item.Split('/','\\').Last());
