@@ -120,7 +120,7 @@ public static class TSPR_To_Async_To
     }
 
 
-    [OverloadResolutionPriority(1)]
+    [OverloadResolutionPriority(2)]
     public static async ValueTask<TSPR<R>> To<T, R>(this TSPR<T> spr, Func<T, ValueTask<SPR<R>>> del)
     {
         try
@@ -135,7 +135,8 @@ public static class TSPR_To_Async_To
             return spr.Pass<R>(SPF.Gen(del.Method, [spr.Value.Payload], e));
         }
     }
-
+    
+    [OverloadResolutionPriority(1)]
     public static async ValueTask<TSPR<R>> To<T, R>(this TSPR<T> spr, Func<T, Task<SPR<R>>> del)
     {
         try
