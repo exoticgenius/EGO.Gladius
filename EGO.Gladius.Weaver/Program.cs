@@ -47,12 +47,14 @@ class Program
                         if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
                         {
                             HandleNormal(asm, method);
+                            Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
                             c++;
                         }
                         else if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve() ||
                             method.ReturnType.Resolve() == method.Module.ImportReference(typeof(ValueTask<>)).Resolve())
                         {
                             HandleTask(asm, method);
+                            Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
                             c++;
                         }
                     }
