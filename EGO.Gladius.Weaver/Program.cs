@@ -21,8 +21,8 @@ class Program
     {
         if (args.Length == 0)
             return;
-
         Console.WriteLine("EGO Gladius Weaver: starting to weave dlls");
+        int c = 0;
         foreach (var path in args)
         {
             SafeFileHandle sfh = File.OpenHandle(path,
@@ -37,20 +37,20 @@ class Program
 
                 var asm = AssemblyDefinition.ReadAssembly(cw, new ReaderParameters { ReadWrite = true, ReadSymbols = true });
 
-                if (!asm.CustomAttributes.Any(x => x.AttributeType.Resolve() == asm.MainModule.ImportReference(typeof(LibrarySkipper)).Resolve()))
+                //if (!asm.CustomAttributes.Any(x => x.AttributeType.Resolve() == asm.MainModule.ImportReference(typeof(LibrarySkipper)).Resolve()))
                 {
                     foreach (var method in asm.MainModule.Types.SelectMany(t => t.Methods).Where(m => m.HasBody))
                     {
                         if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
                         {
                             HandleNormal(asm, method);
-
+                            c++;
                         }
                         else if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve() ||
                             method.ReturnType.Resolve() == method.Module.ImportReference(typeof(ValueTask<>)).Resolve())
                         {
                             HandleTask(asm, method);
-
+                            c++;
                         }
                     }
                     asm.Write(cw, new WriterParameters() { WriteSymbols = true });
@@ -63,30 +63,33 @@ class Program
             {
                 sfh.Close();
             }
-            try
-            {
-                var asms = Assembly.LoadFile(path);
-                foreach (var type in asms.GetTypes())
-                {
-                    foreach (var method in type.GetMethods(
-                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
-                    {
-                        try
-                        {
-                            if (method.MethodImplementationFlags.HasFlag(System.Reflection.MethodImplAttributes.IL))
-                                RuntimeHelpers.PrepareMethod(method.MethodHandle);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"{type.FullName}.{method.Name} failed JIT: {ex.GetType().Name} - {ex.Message}");
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-            }
+
+
+            //try
+            //{
+            //    var asms = Assembly.LoadFile(path);
+            //    foreach (var type in asms.GetTypes())
+            //    {
+            //        foreach (var method in type.GetMethods(
+            //            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
+            //        {
+            //            try
+            //            {
+            //                if (method.MethodImplementationFlags.HasFlag(System.Reflection.MethodImplAttributes.IL))
+            //                    RuntimeHelpers.PrepareMethod(method.MethodHandle);
+            //            }
+            //            catch (Exception ex)
+            //            {
+            //                Console.WriteLine($"{type.FullName}.{method.Name} failed JIT: {ex.GetType().Name} - {ex.Message}");
+            //            }
+            //        }
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //}
         }
+        Console.WriteLine($"EGO Gladius Weaved {c} methods");
     }
 
     private static void HandleNormal(AssemblyDefinition asm, MethodDefinition method)
