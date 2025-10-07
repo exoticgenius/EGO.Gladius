@@ -20,6 +20,7 @@ class Program
 {
     static void Main(string[] args)
     {
+        args = Directory.GetFiles(@"C:\Users\Exoti\source\repos\BNPL_Api\BNPL\BNPL.API\bin\Debug\net10.0", "*.dll").ToArray();
         foreach (var item in args)
         {
             Console.WriteLine(item.Split('/','\\').Last());
@@ -82,9 +83,12 @@ class Program
                             else if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve() ||
                                 method.ReturnType.Resolve() == method.Module.ImportReference(typeof(ValueTask<>)).Resolve())
                             {
-                                HandleTask(asm, method);
-                                Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
-                                c++;
+                                if (((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0].Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
+                                {
+                                    HandleTask(asm, method);
+                                    Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
+                                    c++;
+                                }
                             }
                         }
                         catch (Exception e)
@@ -94,6 +98,7 @@ class Program
                     }
                     Console.WriteLine("asm done");
                     asm.Write(cw, new WriterParameters() { WriteSymbols = true });
+                    resolver.Dispose();
                 }
             }
             catch (Exception e)
