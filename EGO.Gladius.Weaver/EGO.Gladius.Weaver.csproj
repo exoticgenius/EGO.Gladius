@@ -26,6 +26,9 @@
 		<None Include="$(OutputPath)**\*" Pack="true" PackagePath="tools\net8.0\any\" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Mono.Cecil" Version="0.11.6" />

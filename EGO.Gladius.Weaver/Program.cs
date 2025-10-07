@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 [assembly: LibrarySkipper]
@@ -19,6 +20,7 @@ class Program
 {
     static void Main(string[] args)
     {
+        args = ["C:\\Users\\Exoti\\source\\repos\\BNPL_Api\\BNPL\\BNPL.API\\bin\\Debug\\net10.0\\BNPL.Application.dll"];
         foreach (var item in args)
         {
             Console.WriteLine(item);
@@ -38,31 +40,66 @@ class Program
             var cw = new FileStream(sfh, FileAccess.ReadWrite);
             try
             {
-                var asm = AssemblyDefinition.ReadAssembly(cw, new ReaderParameters { ReadWrite = true, ReadSymbols = true });
+                var resolver = new DefaultAssemblyResolver();
+                resolver.AddSearchDirectory(Path.GetDirectoryName(path));
+                resolver.AddSearchDirectory(RuntimeEnvironment.GetRuntimeDirectory());
+                resolver.AddSearchDirectory(AppContext.BaseDirectory);
+                AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
+                    .Select(x => Path.GetDirectoryName(x.Location))
+                    .Distinct()
+                    .ToList()
+                    .ForEach(d => resolver.AddSearchDirectory(d));
+                foreach (var dir in Directory.GetFiles(Path.GetDirectoryName(path), "*.dll"))
+                    resolver.AddSearchDirectory(Path.GetDirectoryName(dir));
+
+                var asm = AssemblyDefinition.ReadAssembly(cw, new ReaderParameters
+                {
+                    ReadWrite = true,
+                    ReadSymbols = true,
+                    AssemblyResolver = resolver
+                });
+
+                foreach (var reference in asm.MainModule.AssemblyReferences)
+                {
+                    resolver.Resolve(reference);
+                }
 
                 if (!asm.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(LibrarySkipper).FullName))
                 {
-                    foreach (var method in asm.MainModule.Types.SelectMany(t => t.Methods).Where(m => m.HasBody))
+                    var methods = asm.MainModule.Types.SelectMany(t => t.Methods).Where(m => m.HasBody).ToList();
+
+                    foreach (var method in methods)
                     {
-                        if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
+                        try
                         {
-                            HandleNormal(asm, method);
-                            Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
-                            c++;
+                            method.Resolve();
+                            if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
+                            {
+                                HandleNormal(asm, method);
+                                Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
+                                c++;
+                            }
+                            else if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve() ||
+                                method.ReturnType.Resolve() == method.Module.ImportReference(typeof(ValueTask<>)).Resolve())
+                            {
+                                HandleTask(asm, method);
+                                Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
+                                c++;
+                            }
                         }
-                        else if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve() ||
-                            method.ReturnType.Resolve() == method.Module.ImportReference(typeof(ValueTask<>)).Resolve())
+                        catch (Exception e)
                         {
-                            HandleTask(asm, method);
-                            Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
-                            c++;
+                            Console.WriteLine(e.Message);
                         }
                     }
+                    Console.WriteLine("asm done");
                     asm.Write(cw, new WriterParameters() { WriteSymbols = true });
                 }
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.Message);
             }
             finally
             {
