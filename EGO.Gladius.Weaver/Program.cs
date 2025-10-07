@@ -19,6 +19,10 @@ class Program
 {
     static void Main(string[] args)
     {
+        foreach (var item in args)
+        {
+            Console.WriteLine(item.Split('/', '\\').Last());
+        }
         if (args.Length == 0)
             return;
         Console.WriteLine("EGO Gladius Weaver: starting to weave dlls");
