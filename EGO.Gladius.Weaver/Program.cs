@@ -21,7 +21,7 @@ class Program
     {
         foreach (var item in args)
         {
-            Console.WriteLine(item.Split('/', '\\').Last());
+            Console.WriteLine(item);
         }
         if (args.Length == 0)
             return;
