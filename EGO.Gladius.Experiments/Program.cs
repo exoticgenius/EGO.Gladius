@@ -1,4 +1,5 @@
-﻿using EGO.Gladius.DataTypes;
+﻿using EGO.Gladius.Contracts;
+using EGO.Gladius.DataTypes;
 namespace DEF
 {
     public class Program
@@ -10,35 +11,43 @@ namespace DEF
         public static async Task Main(string[] args)
         {
             await Task.Yield();
+            var r = await GetSomeResult();
+            if (r.Succeed(out var z))
+            {
+                Console.WriteLine(z);
+            }
+            else
+            {
+                Console.WriteLine(r.Fault.Message ?? r.Fault.Exception.Message);
+            }
 
-            //Console.WriteLine("before");
-
-
-            //SPR<string> result = "Your Result".AsSPR();
-
-            //SPR<string> result = GetSomeResult();
-
-            ////if (result.Faulted())
-            ////{
-            ////    // handle error here using
-            ////    var fault = result.Fault;
-            ////    fault.Message ...
-            ////    fault.Exception ...
-            ////    fault.CapturedContext ...
-            ////    fault.Parameters ...
-            ////}
-
-            //if(result.Succeed(out var val))
-            //{
-            //    // if result succeeded you can have the returned value
-            //}
-            //else
-            //{
-            //    // also you have to implement error handling right here
-            //    // to have a more robust method with least edge cases and unhandled errors/branches
-            //}
+            {
+                //Console.WriteLine("before");
 
 
+                //SPR<string> result = "Your Result".AsSPR();
+
+                //SPR<string> result = GetSomeResult();
+
+                ////if (result.Faulted())
+                ////{
+                ////    // handle error here using
+                ////    var fault = result.Fault;
+                ////    fault.Message ...
+                ////    fault.Exception ...
+                ////    fault.CapturedContext ...
+                ////    fault.Parameters ...
+                ////}
+
+                //if(result.Succeed(out var val))
+                //{
+                //    // if result succeeded you can have the returned value
+                //}
+                //else
+                //{
+                //    // also you have to implement error handling right here
+                //    // to have a more robust method with least edge cases and unhandled errors/branches
+                //}
 
 
 
@@ -48,61 +57,64 @@ namespace DEF
 
 
 
-            //    //SPR<int> res = SPR.FromResult(1).To(Transform).To(Transform);
 
-            //    //Console.WriteLine("after");
 
-            //    //if (res.Succeed(out var re))
-            //    //    Console.WriteLine(re);
-            //    //else
-            //    //    Console.WriteLine(res.Fault.Exception.Message ?? res.Fault.Message);
+                //    //SPR<int> res = SPR.FromResult(1).To(Transform).To(Transform);
 
-            //    var res = Transform(3).MarkScope(TransactionSteps.First).CompleteScope(TransactionSteps.First);
+                //    //Console.WriteLine("after");
 
-            //Console.WriteLine(res.Fault.Exception?.Message);
+                //    //if (res.Succeed(out var re))
+                //    //    Console.WriteLine(re);
+                //    //else
+                //    //    Console.WriteLine(res.Fault.Exception.Message ?? res.Fault.Message);
 
-            //Console.WriteLine("caught");
+                //    var res = Transform(3).MarkScope(TransactionSteps.First).CompleteScope(TransactionSteps.First);
+
+                //Console.WriteLine(res.Fault.Exception?.Message);
+
+                //Console.WriteLine("caught");
+            }
 
             Console.ReadLine();
         }
 
-        public static SPR<int> Transform(int x)
-        {
-            if (x == 44)
-                conv(x);
+        //public static SPR<int> Transform(int x)
+        //{
+        //    if (x == 44)
+        //        conv(x);
 
-            else if (x == 109)
-                throw new Exception("plain ex");
+        //    else if (x == 109)
+        //        throw new Exception("plain ex");
 
-            if (x == 45)
-                return SPF.Gen("fault");
+        //    if (x == 45)
+        //        return SPF.Gen("fault");
 
-            if (x == 46)
-                return SPR.Completed;
+        //    if (x == 46)
+        //        return SPR.Completed;
 
-            switch (x)
-            {
-                case 1: return 2;
+        //    switch (x)
+        //    {
+        //        case 1: return 2;
 
-                case 2: return 2;
-                default:
-                    throw new Exception("sw def");
-            }
+        //        case 2: return 2;
+        //        default:
+        //            throw new Exception("sw def");
+        //    }
 
-            int conv(int z)
-            {
-                return z + C3(z) * 2;
+        //    int conv(int z)
+        //    {
+        //        return z + C3(z) * 2;
 
-                int C3(int xx)
-                {
-                    return x + 1;
-                }
-            }
-        }
+        //        int C3(int xx)
+        //        {
+        //            return x + 1;
+        //        }
+        //    }
+        //}
 
-        static bool hasError = true;
+        static bool hasError = false;
 
-        SPR<string> GetSomeResult()
+        static Task<SPR<string>> GetSomeResult()
         {
 
             if (hasError)
@@ -111,7 +123,7 @@ namespace DEF
             if (hasError)
                 SPF.Gen("Faulted Here");
 
-            return "Processed Result";
+            return Task.FromResult("Processed Result".AsSPR());
         }
     }
 }

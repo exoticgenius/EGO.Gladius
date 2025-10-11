@@ -20,9 +20,13 @@ class Program
 {
     static void Main(string[] args)
     {
+        string p = "C:\\Users\\Exoti\\source\\repos\\exoticgenius\\EGO.Gladius\\EGO.Gladius.Experiments\\bin\\Debug\\net10.0";
+
+        args = Directory.GetFiles(p, "*.dll");
+
         foreach (var item in args)
         {
-            Console.WriteLine(item.Split('/','\\').Last());
+            Console.WriteLine(item.Split('/', '\\').Last());
         }
         if (args.Length == 0)
             return;
@@ -84,7 +88,7 @@ class Program
                             {
                                 if (((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0].Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
                                 {
-                                    HandleTask(asm, method);
+                                        HandleTask(asm, method);
                                     Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
                                     c++;
                                 }
@@ -97,12 +101,13 @@ class Program
                     }
                     Console.WriteLine("asm done");
                     asm.Write(cw, new WriterParameters() { WriteSymbols = true });
+                    asm.Dispose();
                     resolver.Dispose();
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                //Console.WriteLine(e.Message);
             }
             finally
             {
@@ -216,14 +221,106 @@ class Program
         method.Body.ExceptionHandlers.Add(handler);
         return;
     }
+
+
+    private static void HandleSyncTask(AssemblyDefinition asm, MethodDefinition method)
+    {
+        var il = method.Body.GetILProcessor();
+        var oldInstr = method.Body.Instructions.ToList();
+        var first = oldInstr.First();
+        var last = oldInstr.Last();
+
+        var retType = asm.MainModule.ImportReference(method.ReturnType);
+        var retVar = new VariableDefinition(retType);
+        method.Body.Variables.Add(retVar);
+
+        var exType = asm.MainModule.ImportReference(typeof(Exception));
+        var exVar = new VariableDefinition(exType);
+        method.Body.Variables.Add(exVar);
+
+        // labels
+        var catchStart = il.Create(OpCodes.Nop);
+        var catchEnd = il.Create(OpCodes.Nop);
+        var ret = il.Create(OpCodes.Ret);
+        var loadRet = il.Create(OpCodes.Ldloc_S, retVar);
+
+        // hooks end of method to leave peacefully out of try block
+        foreach (var item in oldInstr)
+        {
+            if (item.OpCode == OpCodes.Ret)
+            {
+
+                il.InsertBefore(item, il.Create(OpCodes.Stloc, retVar));
+                il.Replace(item, il.Create(OpCodes.Leave, loadRet));
+            }
+        }
+
+        // catch block
+        il.Append(catchStart);
+        il.Emit(OpCodes.Stloc, exVar);
+        il.Emit(OpCodes.Ldloc, exVar);
+
+        var spfType = asm.MainModule.ImportReference(typeof(SPF));
+
+        var spfCtor = asm.MainModule.ImportReference(spfType.Resolve().Methods
+            .First(m => m.IsConstructor &&
+                        m.Parameters.Count == 1 &&
+                        m.Parameters[0].ParameterType.FullName == exType.FullName));
+
+        var retCtor = asm.MainModule.ImportReference(((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0].Resolve().Methods
+            .First(m => m.IsConstructor &&
+                        m.Parameters.Count == 1 &&
+                        m.Parameters[0].ParameterType.FullName == spfType.FullName));
+
+        retCtor.DeclaringType = ((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0];
+
+        var fromResultMethod = asm.MainModule.ImportReference(asm.MainModule.ImportReference(typeof(Task)).Resolve().Methods
+            .First(x => x.Name == "FromResult" && x.GenericParameters.Count == 1).Resolve());
+
+        var fromResultCallN = new GenericInstanceMethod(fromResultMethod);
+        fromResultCallN.GenericArguments.Add(((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0]);
+        var fromResultCall = asm.MainModule.ImportReference(fromResultCallN);
+
+        il.Emit(OpCodes.Newobj, spfCtor);
+        il.Emit(OpCodes.Newobj, retCtor);
+        il.Emit(OpCodes.Call, fromResultCall);
+
+        il.Emit(OpCodes.Stloc_S, retVar);
+        il.Emit(OpCodes.Leave, loadRet);
+
+
+        il.Append(catchEnd);
+
+
+        il.Append(loadRet);
+        il.Append(ret);
+
+
+        var handler = new ExceptionHandler(ExceptionHandlerType.Catch)
+        {
+            TryStart = first,
+            TryEnd = catchStart,
+            HandlerStart = catchStart,
+            HandlerEnd = catchEnd,
+            CatchType = asm.MainModule.ImportReference(typeof(System.Exception)),
+        };
+
+        method.Body.ExceptionHandlers.Add(handler);
+        return;
+    }
+
     private static void HandleTask(AssemblyDefinition asm, MethodDefinition methodBase)
     {
         var method = ((TypeDefinition)methodBase.CustomAttributes
-            .First(a => a.AttributeType.FullName == typeof(System.Runtime.CompilerServices.AsyncStateMachineAttribute).FullName)
-            .ConstructorArguments[0].Value)
-            .Methods
-            .First(x => x.Name == "MoveNext");
-
+            .FirstOrDefault(a => a.AttributeType.FullName == typeof(System.Runtime.CompilerServices.AsyncStateMachineAttribute).FullName)?
+            .ConstructorArguments[0].Value)?
+            .Methods?
+            .FirstOrDefault(x => x.Name == "MoveNext");
+        if (method is null)
+        {
+            HandleSyncTask(asm, methodBase);
+            return;
+        }
         var oldHandlers = method.Body.ExceptionHandlers;
         ExceptionHandler target = null;
         List<Instruction> targetInstructions = [];
