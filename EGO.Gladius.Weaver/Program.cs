@@ -20,10 +20,6 @@ class Program
 {
     static void Main(string[] args)
     {
-        string p = "C:\\Users\\Exoti\\source\\repos\\exoticgenius\\EGO.Gladius\\EGO.Gladius.Experiments\\bin\\Debug\\net10.0";
-
-        args = Directory.GetFiles(p, "*.dll");
-
         foreach (var item in args)
         {
             Console.WriteLine(item.Split('/', '\\').Last());
@@ -88,7 +84,7 @@ class Program
                             {
                                 if (((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0].Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
                                 {
-                                        HandleTask(asm, method);
+                                    HandleTask(asm, method);
                                     Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
                                     c++;
                                 }
