@@ -194,6 +194,11 @@ public struct SPR : ISP
         throw new Exception("Calling ToStringon ISP object is impossible");
     }
 
+    public void ThrowIfFaulted()
+    {
+        
+    }
+
     #endregion utils
 }
 
@@ -264,6 +269,20 @@ public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
 
         fault = default;
         return false;
+    }
+
+    public void ThrowIfFaulted(out T result)
+    {
+        if (Faulted())
+            Fault.Throw();
+
+        result = Value.Payload;
+    }
+
+    public void ThrowIfFaulted()
+    {
+        if (Faulted())
+            Fault.Throw();
     }
 
     #endregion core funcs

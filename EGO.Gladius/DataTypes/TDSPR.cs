@@ -125,6 +125,20 @@ public struct TDSPR<T> : ITSP<TDSPR<T>, DSPR<T>, T>, IDSP<TDSPR<T>, TSPR<T>, T>,
         return false;
     }
 
+    public void ThrowIfFaulted(out T result)
+    {
+        if (Faulted())
+            Fault.Throw();
+
+        result = Value.Payload;
+    }
+
+    public void ThrowIfFaulted()
+    {
+        if (Faulted())
+            Fault.Throw();
+    }
+
     #endregion core funcs
 
     #region disposal

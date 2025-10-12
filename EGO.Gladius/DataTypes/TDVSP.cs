@@ -53,6 +53,12 @@ public struct TDVSP : ITSP<TDVSP, DVSP>, IDSP<TDVSP, TVSP>, ISPRDescendable<VSP>
 
     public bool Succeed() => Success;
     public bool Faulted() => !Success;
+
+    public void ThrowIfFaulted()
+    {
+        if (Faulted())
+            Fault.Throw();
+    }
     #endregion core funcs
 
     #region disposal

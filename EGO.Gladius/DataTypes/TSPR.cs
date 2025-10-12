@@ -95,6 +95,20 @@ public struct TSPR<T> : ITSP<TSPR<T>, SPR<T>, T>, ISPRDescendable<SPR<T>>, ISPRV
         return false;
     }
 
+    public void ThrowIfFaulted(out T result)
+    {
+        if (Faulted())
+            Fault.Throw();
+
+        result = Value.Payload;
+    }
+
+    public void ThrowIfFaulted()
+    {
+        if (Faulted())
+            Fault.Throw();
+    }
+
     #endregion core funcs
 
     #region transactional

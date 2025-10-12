@@ -46,6 +46,13 @@ public struct TVSP : ITSP<TVSP, VSP>, ISPRDescendable<VSP>
 
     public bool Succeed() => Success;
     public bool Faulted() => !Success;
+
+
+    public void ThrowIfFaulted()
+    {
+        if (Faulted())
+            Fault.Throw();
+    }
     #endregion core funcs
 
     #region transactional

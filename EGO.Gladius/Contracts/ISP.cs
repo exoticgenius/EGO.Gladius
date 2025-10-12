@@ -8,6 +8,8 @@ public interface ISP
 
     bool Faulted();
     bool Succeed();
+
+    void ThrowIfFaulted();
 }
 
 public interface ISP<T> : ISP
@@ -17,4 +19,6 @@ public interface ISP<T> : ISP
     bool Faulted(out SPF fault);
 
     bool HasValue();
+
+    void ThrowIfFaulted(out T result);
 }
