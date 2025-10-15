@@ -1,10 +1,14 @@
 <Project>
-	<Target Name="RunAfterBuild" AfterTargets="Build">
+	<Target Name="RunAfterBuild" AfterTargets="Build;Rebuild">
 		<ItemGroup>
 			<BuiltDlls Include="$(TargetDir)*.dll" />
-			<BuiltDlls Include="$(PublishDir)*.dll" Condition="Exists('$(PublishDir)')" />
 		</ItemGroup>
 		<Exec Command="dotnet exec &quot;$(MSBuildThisFileDirectory)..\tools\net10.0\any\EGO.Gladius.Weaver.dll&quot; @(BuiltDlls->'&quot;%(FullPath)&quot;', ' ')" />
 	</Target>
-	
+	<Target Name="RunAfterPublish" AfterTargets="Publish">
+		<ItemGroup>
+			<BuiltDlls Include="$(PublishDir)*.dll" />
+		</ItemGroup>
+		<Exec Command="dotnet exec &quot;$(MSBuildThisFileDirectory)..\tools\net10.0\any\EGO.Gladius.Weaver.dll&quot; @(BuiltDlls->'&quot;%(FullPath)&quot;', ' ')" />
+	</Target>
 </Project>

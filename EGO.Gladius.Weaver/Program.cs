@@ -270,7 +270,12 @@ class Program
 
         retCtor.DeclaringType = ((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0];
 
-        var fromResultMethod = asm.MainModule.ImportReference(asm.MainModule.ImportReference(typeof(Task)).Resolve().Methods
+        var TaskKind = typeof(Task);
+
+        if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(ValueTask<>)).Resolve())
+            TaskKind = typeof(ValueTask);
+
+            var fromResultMethod = asm.MainModule.ImportReference(asm.MainModule.ImportReference(TaskKind).Resolve().Methods
             .First(x => x.Name == "FromResult" && x.GenericParameters.Count == 1).Resolve());
 
         var fromResultCallN = new GenericInstanceMethod(fromResultMethod);
