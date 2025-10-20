@@ -172,6 +172,30 @@ public struct SPR : ISP
         return lastSPF ?? SPF.Gen("fault running source");
     }
 
+    public static SPR<T[]> WhenAll<T>(IEnumerable<SPR<T>> values)
+    {
+        List<Exception> faults = [];
+        List<T> results = [];
+
+        foreach (var item in values)
+        {
+            try
+            {
+                item.ThrowIfFaulted(out var val);
+
+                results.Add(val);
+            }
+            catch(Exception e)
+            {
+                faults.Add(e);
+            }
+        }
+
+        if(faults.Count > 0) return SPF.Gen(new AggregateException(faults));
+
+        return results.ToArray();
+    }
+
     #region utils
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     [EditorBrowsable(EditorBrowsableState.Never)]
