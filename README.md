@@ -6,9 +6,11 @@ Your Simple Sharp tool to Unify Result/Error handling scenarios with maximum Eff
 > just like what programmers do in the IDE battlefield
 
 ## The philosophy is:
-> Any call is not Perfectly Valid Until You Validate it
+> Any call is not Perfectly Valid Until You Validate it 
 > 
 > So The Main Return Name is SPR (Super Posed Result)
+> 
+> then go full PDD (Paranoid Driven Design)
 
 
 ## Install From Nuget
