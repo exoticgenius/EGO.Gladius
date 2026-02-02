@@ -6,15 +6,17 @@ Your Simple Sharp tool to Unify Result/Error handling scenarios with maximum Eff
 > just like what programmers do in the IDE battlefield
 
 ## The philosophy is:
-> Any call is not Perfectly Valid Until You Validate it
+> Any call is not Perfectly Valid Until You Validate it 
 > 
 > So The Main Return Name is SPR (Super Posed Result)
+> 
+> then go full PDD (Paranoid Driven Design)
 
 
 ## Install From Nuget
 
 [Base Library](https://www.nuget.org/packages/EGO.Gladius/) <br>
-[Runtime Weaver](https://www.nuget.org/packages/EGO.Gladius.Weaver/)
+[Runtime Weaver](https://www.nuget.org/packages/EGO.Gladius.Weaver/) <br>
 Install and rush in
 
 ## Get Started
