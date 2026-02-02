@@ -43,6 +43,9 @@ public struct VSP : ISP
         new(fault);
     public static implicit operator VSP(in SPR tag) =>
         new(true, default);
+    
+    public static bool operator true(VSP vsp) => vsp.Succeed();
+    public static bool operator false(VSP vsp) => vsp.Succeed();
     #endregion operators
 
     #region utils
