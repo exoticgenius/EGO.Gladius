@@ -23,7 +23,7 @@ public struct VSP : ISP
     public VSP(bool success, SPF fault)
     {
         Success = success;
-        Fault = Fault;
+        Fault = fault;
     }
 
     public VSP(SPF fault)
@@ -51,7 +51,7 @@ public struct VSP : ISP
         new(true, default);
     
     public static bool operator true(VSP vsp) => vsp.Succeed();
-    public static bool operator false(VSP vsp) => vsp.Succeed();
+    public static bool operator false(VSP vsp) => vsp.Faulted();
     #endregion operators
 
     #region utils

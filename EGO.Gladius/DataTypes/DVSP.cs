@@ -29,7 +29,7 @@ public struct DVSP : IDSP<DVSP, VSP>, ISPRDescendable<VSP>
     public DVSP(bool success, SPF fault)
     {
         Success = success;
-        Fault = Fault;
+        Fault = fault;
     }
 
     public DVSP(

@@ -213,11 +213,13 @@ public struct SPR : ISP
         }
     }
 
+#if Release
     public override string ToString()
     {
         throw new Exception("Calling ToStringon ISP object is impossible");
     }
-
+#endif
+    
     public void ThrowIfFaulted()
     {
         
@@ -323,9 +325,8 @@ public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
     public static implicit operator SPR<T>(in Exception e) =>
         new(SPF.Gen(e));
 
-        
-        public static bool operator true(SPR<T> spr) => spr.Succeed();
-        public static bool operator false(SPR<T> spr) => spr.Succeed();
+    public static bool operator true(SPR<T> spr) => spr.Succeed();
+    public static bool operator false(SPR<T> spr) => spr.Faulted();
             
     #endregion Operators
 

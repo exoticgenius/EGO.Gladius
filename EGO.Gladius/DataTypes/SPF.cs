@@ -77,10 +77,10 @@ public struct SPF
 
     private static string GenerateStackTrace()
     {
-        StackFrame[] frames = new StackTrace(WithFile).GetFrames();
+        StackFrame[]? frames = new StackTrace(WithFile).GetFrames();
         StringBuilder sb = new();
 
-        foreach (StackFrame frame in frames)
+        foreach (StackFrame frame in frames ?? [])
         {
             string? source = frame.GetFileName();
 
