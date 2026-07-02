@@ -167,7 +167,7 @@ public struct TDVSP : ITSP<TDVSP, DVSP>, IDSP<TDVSP, TVSP>, ISPRDescendable<VSP>
                     Fault.Exception?.Message ??
                     "Operation Faulted";
 
-            return "Successfuly Executed";
+            return "Successfully Executed";
         }
     }
 

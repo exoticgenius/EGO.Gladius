@@ -209,7 +209,7 @@ public struct SPR : ISP
                     Fault.Exception?.Message ??
                     "Operation Faulted";
 
-            return "Successfuly Executed";
+            return "Successfully Executed";
         }
     }
 

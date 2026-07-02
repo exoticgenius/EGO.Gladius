@@ -113,7 +113,7 @@ public struct DVSP : IDSP<DVSP, VSP>, ISPRDescendable<VSP>
                     Fault.Exception?.Message ??
                     "Operation Faulted";
 
-            return "Successfuly Executed";
+            return "Successfully Executed";
         }
     }
 

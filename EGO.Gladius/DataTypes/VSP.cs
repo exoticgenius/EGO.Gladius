@@ -8,6 +8,10 @@ namespace EGO.Gladius.DataTypes;
 [DebuggerDisplay("{DebuggerPreview}")]
 public struct VSP : ISP
 {
+    #region fields
+    public readonly static VSP Completed = new(true, default);
+    #endregion
+    
     #region props
     public SPF Fault { get; }
     internal bool Success { get; set; }
@@ -67,7 +71,7 @@ public struct VSP : ISP
                     Fault.Exception?.Message ??
                     "Operation Faulted";
 
-            return "Successfuly Executed";
+            return "Successfully Executed";
         }
     }
 
