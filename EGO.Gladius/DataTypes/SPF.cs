@@ -17,7 +17,6 @@ public struct SPF
     public string? Message { get; }
     #endregion ' props '
 
-
     #region ' ctors '
     public SPF() : this(default, default, default, default) { }
     public SPF(MethodInfo capturedContext) : this(capturedContext, default, default, default) { }
