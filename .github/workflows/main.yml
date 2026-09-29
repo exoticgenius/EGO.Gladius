@@ -9,6 +9,9 @@
       publish:
         runs-on: ubuntu-latest
 
+        permissions:
+            id-token: write
+
         steps:
           - name: Checkout code
             uses: actions/checkout@v3
@@ -24,6 +27,13 @@
           - name: Build the project
             run: dotnet build --configuration Release --no-restore
 
+          - name: NuGet login (OIDC → temp API key)
+            uses: NuGet/login@v1
+            id: login
+            with:
+              user: ExoticGenius # Recommended: use a secret like ${{ secrets.NUGET_USER }} for your nuget.org username (profile name), NOT your email address
+    
+
           - name: Pack the NuGet package
             run: |
                  dotnet pack EGO.Gladius/EGO.Gladius.csproj --configuration Release --no-build --output .
@@ -31,4 +41,4 @@
 
 
           - name: Push to NuGet.org
-            run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
+            run: dotnet nuget push "*.nupkg" --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
