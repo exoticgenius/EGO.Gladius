@@ -282,7 +282,7 @@ public struct TDSPR<T> : ITSP<TDSPR<T>, DSPR<T>, T>, IDSP<TDSPR<T>, TSPR<T>, T>,
 #if Release
     public override string ToString()
     {
-        throw new Exception("Calling ToStringon ISP object is impossible");
+        throw new Exception("Calling ToString on ISP object is impossible");
     }
 #endif
     #endregion utils

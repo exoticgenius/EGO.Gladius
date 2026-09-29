@@ -184,7 +184,7 @@ public struct TSPR<T> : ITSP<TSPR<T>, SPR<T>, T>, ISPRDescendable<SPR<T>>, ISPRV
 #if Release
     public override string ToString()
     {
-        throw new Exception("Calling ToStringon ISP object is impossible");
+        throw new Exception("Calling ToString on ISP object is impossible");
     }
 #endif
     #endregion utils

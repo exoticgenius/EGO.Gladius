@@ -174,7 +174,7 @@ public struct TDVSP : ITSP<TDVSP, DVSP>, IDSP<TDVSP, TVSP>, ISPRDescendable<VSP>
 #if Release
     public override string ToString()
     {
-        throw new Exception("Calling ToStringon ISP object is impossible");
+        throw new Exception("Calling ToString on ISP object is impossible");
     }
 #endif
     #endregion utils
