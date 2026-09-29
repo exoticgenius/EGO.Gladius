@@ -15,7 +15,6 @@ public struct VSP : ISP
     #region props
     public SPF Fault { get; }
     internal bool Success { get; set; }
-    public static readonly VSP Completed = new  VSP(true, default);
     #endregion props
 
     #region ctors
