@@ -21,12 +21,10 @@ class Program
 {
 	static void Main(string[] args)
 	{
-		// foreach (var item in args)
-		// {
-		//     Console.WriteLine(item.Split('/', '\\').Last());
-		// }
-
-		args = Directory.GetFiles("/home/ego/Work/Source/ExoticGenius/EGO.Gladius/EGO.Gladius/EGO.Gladius.Experiments/bin/Debug/net10.0", "*.dll");
+		foreach (var item in args)
+		{
+		    Console.WriteLine(item.Split('/', '\\').Last());
+		}
 
 		if (args.Length == 0)
 			return;
