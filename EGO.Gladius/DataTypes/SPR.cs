@@ -215,7 +215,7 @@ public struct SPR : ISP
 
     public override string ToString()
     {
-        throw new Exception("Calling ToStringon ISP object is impossible");
+        throw new Exception("Calling ToString on ISP object is impossible");
     }
 
     public void ThrowIfFaulted()
@@ -349,7 +349,7 @@ public struct SPR<T> : ISP<T>, ISPRDescendable<T>, ISPRVoidable<VSP>
 #if Release
     public override string ToString()
     {
-        throw new Exception("Calling ToStringon ISP object is impossible");
+        throw new Exception("Calling ToString on ISP object is impossible");
     }
 #endif
     #endregion utils

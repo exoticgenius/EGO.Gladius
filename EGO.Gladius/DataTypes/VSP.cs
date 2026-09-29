@@ -11,6 +11,7 @@ public struct VSP : ISP
     #region props
     public SPF Fault { get; }
     internal bool Success { get; set; }
+    public static readonly VSP Completed = new  VSP(true, default);
     #endregion props
 
     #region ctors
@@ -74,7 +75,7 @@ public struct VSP : ISP
 #if Release
     public override string ToString()
     {
-        throw new Exception("Calling ToStringon ISP object is impossible");
+        throw new Exception("Calling ToString on ISP object is impossible");
     }
 #endif
     #endregion utils

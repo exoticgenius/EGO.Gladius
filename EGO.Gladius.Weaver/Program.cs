@@ -72,27 +72,33 @@ class Program
 				{
 					var methods = asm.MainModule.Types.SelectMany(t => t.Methods).Where(m => m.HasBody).ToList();
 
+
+					int weavedInAsm = 0;
 					foreach (var method in methods)
 					{
 						try
 						{
 							method.Resolve();
-							if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
+							if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve() ||
+								method.ReturnType.Resolve() == method.Module.ImportReference(typeof(VSP)).Resolve())
 							{
 								HandleNormal(asm, method);
 								Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
 								c++;
+
+								weavedInAsm++;
 							}
 							else if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(Task<>)).Resolve() ||
 									 method.ReturnType.Resolve() == method.Module.ImportReference(typeof(ValueTask<>)).Resolve())
 							{
-								//if (method.Name == "GetAsync")
-									if (((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0].Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve())
-									{
-										HandleTask(asm, method);
-										Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
-										c++;
-									}
+								if (((GenericInstanceType)method.ReturnType).GenericArguments[0].Resolve() == method.Module.ImportReference(typeof(SPR<>)).Resolve() ||
+									((GenericInstanceType)method.ReturnType).GenericArguments[0].Resolve() == method.Module.ImportReference(typeof(VSP)).Resolve())
+								{
+									HandleTask(asm, method);
+									Console.WriteLine($"weaved {method.DeclaringType.Name}.{method.Name} method");
+									c++;
+									weavedInAsm++;
+								}
 							}
 						}
 						catch (Exception e)
@@ -102,6 +108,14 @@ class Program
 						}
 					}
 					Console.WriteLine("asm done");
+
+					if (weavedInAsm > 0)
+					{
+						var attrCtor = asm.MainModule.ImportReference(typeof(LibrarySkipper)).Resolve().Methods.First(x => x.IsConstructor && !x.HasParameters);
+
+						asm.CustomAttributes.Add(new CustomAttribute(asm.MainModule.ImportReference(attrCtor)));
+					}
+
 					asm.Write(cw, new WriterParameters()
 					{
 						WriteSymbols = true
@@ -270,13 +284,27 @@ class Program
 				m.Parameters.Count == 1 &&
 				m.Parameters[0].ParameterType.FullName == exType.FullName));
 
-		var retCtor = asm.MainModule.ImportReference(((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0].Resolve().Methods
-			.First(m => m.IsConstructor &&
-				m.Parameters.Count == 1 &&
-				m.Parameters[0].ParameterType.FullName == spfType.FullName));
+		MethodReference retCtor = null;
+		if (((GenericInstanceType)method.ReturnType).GenericArguments[0].Resolve() == asm.MainModule.ImportReference(typeof(VSP)).Resolve())
+		{
+			//var vspDef  = asm.MainModule.ImportReference(typeof(VSP));
 
-		retCtor.DeclaringType = ((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0];
+			retCtor = asm.MainModule.ImportReference(asm.MainModule.ImportReference(typeof(VSP)).Resolve().Methods
+				.First(m => m.IsConstructor &&
+					m.Parameters.Count == 1 &&
+					m.Parameters[0].ParameterType.FullName == spfType.FullName));
 
+			//retCtor.DeclaringType = vspDef;
+		}
+		else
+		{
+			retCtor = asm.MainModule.ImportReference(((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0].Resolve().Methods
+				.First(m => m.IsConstructor &&
+					m.Parameters.Count == 1 &&
+					m.Parameters[0].ParameterType.FullName == spfType.FullName));
+
+			retCtor.DeclaringType = ((Mono.Cecil.GenericInstanceType)method.ReturnType).GenericArguments[0];
+		}
 		var TaskKind = typeof(Task);
 
 		if (method.ReturnType.Resolve() == method.Module.ImportReference(typeof(ValueTask<>)).Resolve())
@@ -380,12 +408,30 @@ class Program
 				m.Parameters.Count == 1 &&
 				m.Parameters[0].ParameterType.FullName == asm.MainModule.ImportReference(typeof(Exception)).FullName));
 
-		var retCtor = asm.MainModule.ImportReference(((Mono.Cecil.GenericInstanceType)methodBase.ReturnType).GenericArguments[0].Resolve().Methods
-			.First(m => m.IsConstructor &&
-				m.Parameters.Count == 1 &&
-				m.Parameters[0].ParameterType.FullName == spfType.FullName));
+		MethodReference retCtor = null;
+		if (((GenericInstanceType)methodBase.ReturnType).GenericArguments[0].Resolve() == asm.MainModule.ImportReference(typeof(VSP)).Resolve())
+		{
+			//var vspDef  = asm.MainModule.ImportReference(typeof(VSP));
 
-		retCtor.DeclaringType = ((Mono.Cecil.GenericInstanceType)methodBase.ReturnType).GenericArguments[0];
+			retCtor = asm.MainModule.ImportReference(asm.MainModule.ImportReference(typeof(VSP)).Resolve().Methods
+				.First(m => m.IsConstructor &&
+					m.Parameters.Count == 1 &&
+					m.Parameters[0].ParameterType.FullName == spfType.FullName));
+			//retCtor.DeclaringType = vspDef;
+		}
+		else
+		{
+			var sprDef  = asm.MainModule.ImportReference(typeof(SPR<>));
+			var sprType = new GenericInstanceType(sprDef);
+			sprType.GenericArguments.Add(method.DeclaringType.GenericParameters[0]);
+
+			retCtor = asm.MainModule.ImportReference(((Mono.Cecil.GenericInstanceType)methodBase.ReturnType).GenericArguments[0].Resolve().Methods
+				.First(m => m.IsConstructor &&
+					m.Parameters.Count == 1 &&
+					m.Parameters[0].ParameterType.FullName == spfType.FullName));
+
+			retCtor.DeclaringType = sprType;
+		}
 
 		il.InsertBefore(lastCatcher, il.Create(OpCodes.Newobj, spfCtor));
 		il.InsertBefore(lastCatcher, il.Create(OpCodes.Newobj, retCtor));
