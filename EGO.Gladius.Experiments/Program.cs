@@ -13,7 +13,7 @@ public class Program
     public static async Task Main(string[] args)
     {
         await Task.Yield();
-        var r = GetSomeResult("123");
+        var r = await GetSomeResult("123");
         if (r.Succeed())
         {
             Console.WriteLine("caught");
@@ -26,8 +26,9 @@ public class Program
         Console.ReadLine();
     }
 
-    public static VSP GetSomeResult<T>(T input)
+    public static async Task<SPR<int>> GetSomeResult<T>(T input)
     {
-        throw  new  NotImplementedException();
+        await Task.Delay(2);
+        return 2;
     }
 }

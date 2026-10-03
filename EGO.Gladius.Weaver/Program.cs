@@ -21,10 +21,13 @@ class Program
 {
 	static void Main(string[] args)
 	{
-		foreach (var item in args)
-		{
-		    Console.WriteLine(item.Split('/', '\\').Last());
-		}
+		// foreach (var item in args)
+		// {
+		//     Console.WriteLine(item.Split('/', '\\').Last());
+		// }
+
+		//args = Directory.GetFiles("/home/ego/Work/Source/ExoticGenius/EGO.Gladius/EGO.Gladius/EGO.Gladius.Experiments/bin/Debug/net10.0", "*.dll");
+		args = Directory.GetFiles("/home/ego/Work/Source/WorkRepos/Sepas/BNPL_Api/BNPL/BNPL.API/bin/Debug/net10.0", "*.dll");
 
 		if (args.Length == 0)
 			return;
@@ -421,14 +424,26 @@ class Program
 		{
 			var sprDef  = asm.MainModule.ImportReference(typeof(SPR<>));
 			var sprType = new GenericInstanceType(sprDef);
-			sprType.GenericArguments.Add(method.DeclaringType.GenericParameters[0]);
+			if (method.DeclaringType.HasGenericParameters)
+			{
+				sprType.GenericArguments.Add(method.DeclaringType.GenericParameters[0]);
 
-			retCtor = asm.MainModule.ImportReference(((Mono.Cecil.GenericInstanceType)methodBase.ReturnType).GenericArguments[0].Resolve().Methods
-				.First(m => m.IsConstructor &&
-					m.Parameters.Count == 1 &&
-					m.Parameters[0].ParameterType.FullName == spfType.FullName));
+				retCtor = asm.MainModule.ImportReference(((Mono.Cecil.GenericInstanceType)methodBase.ReturnType).GenericArguments[0].Resolve().Methods
+					.First(m => m.IsConstructor &&
+						m.Parameters.Count == 1 &&
+						m.Parameters[0].ParameterType.FullName == spfType.FullName));
 
-			retCtor.DeclaringType = sprType;
+				retCtor.DeclaringType = sprType;
+			}
+			else
+			{
+				retCtor = asm.MainModule.ImportReference(((Mono.Cecil.GenericInstanceType)methodBase.ReturnType).GenericArguments[0].Resolve().Methods
+					.First(m => m.IsConstructor &&
+						m.Parameters.Count == 1 &&
+						m.Parameters[0].ParameterType.FullName == spfType.FullName));
+
+				retCtor.DeclaringType = ((Mono.Cecil.GenericInstanceType)methodBase.ReturnType).GenericArguments[0];
+			}
 		}
 
 		il.InsertBefore(lastCatcher, il.Create(OpCodes.Newobj, spfCtor));
