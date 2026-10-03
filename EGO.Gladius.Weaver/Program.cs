@@ -21,13 +21,13 @@ class Program
 {
 	static void Main(string[] args)
 	{
-		// foreach (var item in args)
-		// {
-		//     Console.WriteLine(item.Split('/', '\\').Last());
-		// }
+		foreach (var item in args)
+		{
+		    Console.WriteLine(item.Split('/', '\\').Last());
+		}
 
 		//args = Directory.GetFiles("/home/ego/Work/Source/ExoticGenius/EGO.Gladius/EGO.Gladius/EGO.Gladius.Experiments/bin/Debug/net10.0", "*.dll");
-		args = Directory.GetFiles("/home/ego/Work/Source/WorkRepos/Sepas/BNPL_Api/BNPL/BNPL.API/bin/Debug/net10.0", "*.dll");
+		//args = Directory.GetFiles("/home/ego/Work/Source/WorkRepos/Sepas/BNPL_Api/BNPL/BNPL.API/bin/Debug/net10.0", "*.dll");
 
 		if (args.Length == 0)
 			return;
